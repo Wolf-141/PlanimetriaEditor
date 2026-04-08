@@ -115,13 +115,6 @@ export class FloorPlanService {
   }
 
   // ── Import ─────────────────────────────────────────────────────────────
-  /**
-   * Restores rooms and stations from a previously exported FloorPlanExport.
-   * Note: the image itself is not embedded in the export, so the canvas will
-   * show no background until the user uploads the matching floor-plan image.
-   * If you want to preserve the image too, store `image.dataUrl` in the export
-   * and call `this.image.set(...)` here.
-   */
   importFromExport(data: FloorPlanExport): void {
     const rooms: Room[] = data.rooms.map(r => ({
       id:    r.id,
