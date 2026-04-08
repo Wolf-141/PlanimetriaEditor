@@ -37,7 +37,7 @@ export interface MarkerDragStart {
   styles: [`
     :host {
       position: absolute;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
       background: #185FA5;
       color: #E6F1FB;
       border: 2px solid #0C447C;
@@ -103,6 +103,7 @@ export interface MarkerDragStart {
 })
 export class RoomMarkerComponent {
   @Input({ required: true }) room!: Room;
+  @Input() zoom = 1;
 
   @Output() dragStart   = new EventEmitter<MarkerDragStart>();
   @Output() addStation  = new EventEmitter<string>();  // roomId
@@ -111,6 +112,7 @@ export class RoomMarkerComponent {
 
   @HostBinding('style.left') get left() { return this.room.xPct + '%'; }
   @HostBinding('style.top')  get top()  { return this.room.yPct + '%'; }
+  @HostBinding('style.--marker-scale') get markerScale() { return 1 / this.zoom; }
 
   @HostListener('mousedown', ['$event'])
   onHostMouseDown(e: MouseEvent): void {

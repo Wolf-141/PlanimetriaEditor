@@ -187,29 +187,7 @@ export class FloorCanvasComponent implements AfterViewInit {
     this.elRef.nativeElement.style.cursor = 'crosshair';
   }
 
-  // ── SVG connection lines ───────────────────────────────────────────────
-
-  /**
-   * Returns line coordinates slightly inset from the room/station centres
-   * so the arrowhead doesn't overlap the marker box.
-   */
-  lineCoords(stationId: string): { x1: string; y1: string; x2: string; y2: string } | null {
-    const station = this.fps.stations().find(s => s.id === stationId);
-    const room    = station ? this.fps.roomMap()[station.roomId] : null;
-    if (!station || !room) return null;
-    const dx = station.xPct - room.xPct;
-    const dy = station.yPct - room.yPct;
-    const d  = Math.sqrt(dx * dx + dy * dy) || 1;
-    const inset = 3;
-    return {
-      x1: (room.xPct    + (dx / d) * inset) + '%',
-      y1: (room.yPct    + (dy / d) * inset) + '%',
-      x2: (station.xPct - (dx / d) * inset) + '%',
-      y2: (station.yPct - (dy / d) * inset) + '%',
-    };
-  }
-
-  // ── Helpers ────────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────
 
   private hostRect() { return this.elRef.nativeElement.getBoundingClientRect(); }
 
