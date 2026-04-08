@@ -126,3 +126,65 @@ button {
   background: #fff;
   flex-shrink: 0;
 }
+
+// ── Import error modal ──────────────────────────────────────────────────────
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 20px 24px 16px;
+  min-width: 300px;
+  max-width: 420px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #A32D2D;
+
+  svg { flex-shrink: 0; stroke: #A32D2D; }
+}
+
+.modal-body {
+  font-size: 12px;
+  color: #444;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.modal-btn {
+  font-size: 12px;
+  padding: 6px 18px;
+  background: #185FA5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover { background: #145089; }
+  &:active { transform: scale(0.98); }
+}

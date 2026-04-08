@@ -94,7 +94,6 @@ export class FloorPlanService {
   }
 
   // ── Zoom / Pan ─────────────────────────────────────────────────────────
-  /** Call from canvas component, providing the focal point in canvas-local px. */
   applyZoom(factor: number, focalX: number, focalY: number): void {
     const current = this.zoom();
     const next = Math.max(0.2, Math.min(8, current * factor));
@@ -115,10 +114,41 @@ export class FloorPlanService {
     this.pan.set({ x: 0, y: 0 });
   }
 
+  // ── Import ─────────────────────────────────────────────────────────────
+  /**
+   * Restores rooms and stations from a previously exported FloorPlanExport.
+   * Note: the image itself is not embedded in the export, so the canvas will
+   * show no background until the user uploads the matching floor-plan image.
+   * If you want to preserve the image too, store `image.dataUrl` in the export
+   * and call `this.image.set(...)` here.
+   */
+  importFromExport(data: FloorPlanExport): void {
+    const rooms: Room[] = data.rooms.map(r => ({
+      id:    r.id,
+      label: r.label,
+      xPct:  r.position.xPct,
+      yPct:  r.position.yPct,
+    }));
+
+    const stations: Station[] = data.stations.map(s => ({
+      id:     s.id,
+      label:  s.label,
+      xPct:   s.position.xPct,
+      yPct:   s.position.yPct,
+      roomId: s.roomId,
+    }));
+
+    this.rooms.set(rooms);
+    this.stations.set(stations);
+    this.setMode('view');
+    this.resetView();
+  }
+
   // ── Misc ───────────────────────────────────────────────────────────────
   clearAll(): void {
     this.rooms.set([]);
     this.stations.set([]);
+    this.image.set(null);
     this.setMode('view');
   }
 

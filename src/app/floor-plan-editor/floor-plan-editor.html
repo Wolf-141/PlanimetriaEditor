@@ -6,13 +6,23 @@
 
     <div class="sep"></div>
 
-    <!-- Upload -->
+    <!-- Upload image -->
     <button (click)="fileInput.click()">
       <img src="/images/file.png" alt="upload file" width="16" height="16">
       Upload
     </button>
     <input #fileInput type="file" accept="image/*" style="display:none"
            (change)="fps.loadImage($any($event.target).files[0])">
+
+    <!-- Import JSON -->
+    <button (click)="jsonInput.click()" [disabled]="!hasImage()">
+      <img src="/images/import.png" alt="importJSON" width="16" height="16">
+      Import from JSON
+    </button>
+    <input #jsonInput type="file" accept="application/json,.json" style="display:none"
+           (change)="importJSON($any($event.target).files[0]); jsonInput.value = ''">
+    
+    <div class="sep"></div>
 
     <!-- Add room -->
     <button [class.active]="isPlacingRoom()" [disabled]="!hasImage()"
@@ -80,5 +90,24 @@
     <span>{{ roomCount() }} {{ roomCount() === 1 ? 'room' : 'rooms' }}</span>
     <span>{{ stationCount() }} {{ stationCount() === 1 ? 'station' : 'stations' }}</span>
   </div>
+
+  <!-- ── Import error modal ───────────────────────────────────────────── -->
+  @if (importError()) {
+    <div class="modal-backdrop" (click)="importError.set(null)">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18">
+            <circle cx="10" cy="10" r="8"/>
+            <path d="M10 6v4M10 13.5v.5"/>
+          </svg>
+          <span>Import failed</span>
+        </div>
+        <p class="modal-body">{{ importError() }}</p>
+        <div class="modal-footer">
+          <button class="modal-btn" (click)="importError.set(null)">OK</button>
+        </div>
+      </div>
+    </div>
+  }
 
 </div>
