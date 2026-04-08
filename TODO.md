@@ -1,6 +1,6 @@
-- [] Possibilità di uplodare DXF (forse anche DWG) per il background del floor plan (convertendoli in dei file SVG o PNG).
+- [ ] Possibilità di uplodare DXF (forse anche DWG) per il background del floor plan (convertendoli in dei file SVG o PNG).
 - [x] I marker per le stanze e le postazioni sono troppo grandi quando zoommi dentro, bisogna scalare la mappa senza far scalare i marker.
-- [] Possibilità di importare JSON per riutilizzare floor plan già creati in passato (ovviamente il JSON deve essere validato, incaso di JSON non valido/corrotto mandare pop-up di errore e non importare).
-- [] Implementazione del tasto "Add meeting rooms" per aggiungere stanze riunioni (dovrebbe funzionare come il tasto "Add rooms" ma nelle meeting rooms non puoi aggiungere postazioni).
-- [] rendere visibili le postazioni solo se la stanza è selezionata, implementare counter accanto al nome (label) della stanza che conti le postazioni associate alla stanza.
-- [] Implementazione di hotkeys per utilizzare l'editor in modo più veloce.
+- [ ] Possibilità di importare JSON per riutilizzare floor plan già creati in passato (ovviamente il JSON deve essere validato, incaso di JSON non valido/corrotto mandare pop-up di errore e non importare).
+- [ ] Implementazione del tasto "Add meeting rooms" per aggiungere stanze riunioni (dovrebbe funzionare come il tasto "Add rooms" ma nelle meeting rooms non puoi aggiungere postazioni).
+- [ ] rendere visibili le postazioni solo se la stanza è selezionata, implementare counter accanto al nome (label) della stanza che conti le postazioni associate alla stanza.
+- [ ] Implementazione di hotkeys per utilizzare l'editor in modo più veloce.

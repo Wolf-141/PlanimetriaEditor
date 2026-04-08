@@ -5,6 +5,13 @@ export interface Room {
   yPct: number;
 }
 
+export interface Meeting {
+  id: string;
+  label: string;
+  xPct: number;
+  yPct: number;
+}
+
 export interface Station {
   id: string;
   label: string;
@@ -20,12 +27,21 @@ export interface ImageMeta {
   dataUrl: string;
 }
 
+export type RoomType = 'normal' | 'meeting';
+
 export type EditorMode = 'view' | 'placing-room' | 'placing-station';
 
 /** Shape of the exported JSON file */
 export interface FloorPlanExport {
   exportedAt: string;
   image: Omit<ImageMeta, 'dataUrl'>;
+  /*
+  meetings: Array<{
+    id: string;
+    label: string;
+    position: { xPct: number; yPct: number };
+  }>;
+  */
   rooms: Array<{
     id: string;
     label: string;
