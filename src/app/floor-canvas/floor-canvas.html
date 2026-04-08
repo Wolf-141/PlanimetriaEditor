@@ -1,0 +1,68 @@
+<!-- Drop zone (shown when no image loaded) -->
+@if (!fps.image()) {
+  <div class="drop-zone"
+       (click)="fileInput.click()"
+       (dragover)="$event.preventDefault()"
+       (drop)="$event.preventDefault(); onDrop($event)">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="4" y="8" width="28" height="20" rx="2"/>
+      <path d="M4 16h28M10 8v8M18 4v12M26 8v8"/>
+    </svg>
+    <p>Drop floor plan here</p>
+    <small>PNG, JPG, SVG · Click to browse</small>
+  </div>
+}
+
+<!-- Hidden file input -->
+<input #fileInput type="file" accept="image/*" style="display:none"
+       (change)="onFileSelected($event)">
+
+<!-- Scene (transformed for zoom/pan) -->
+@if (fps.image(); as img) {
+  <div class="scene" [style.transform]="sceneTransform()">
+
+    <!-- Floor plan image -->
+    <img class="floor-img" [src]="img.dataUrl" draggable="false" alt="Floor plan">
+
+    <!-- SVG connection lines -->
+    <svg class="svg-layer" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+          <polygon points="0 0,6 2,0 4" fill="#3B6D11" opacity="0.85"/>
+        </marker>
+      </defs>
+
+      @for (station of fps.stations(); track station.id) {
+        @let coords = lineCoords(station.id);
+        @if (coords) {
+          <line
+            [attr.x1]="coords.x1" [attr.y1]="coords.y1"
+            [attr.x2]="coords.x2" [attr.y2]="coords.y2"
+            stroke="#3B6D11" stroke-width="1.5"
+            stroke-dasharray="5 3" opacity="0.75"
+            marker-end="url(#arrowhead)"/>
+        }
+      }
+    </svg>
+
+    <!-- Room markers -->
+    @for (room of fps.rooms(); track room.id) {
+      <app-room-marker
+        [room]="room"
+        (dragStart)="onRoomDragStart($event)"
+        (addStation)="onAddStation($event)"
+        (delete)="fps.deleteRoom($event)"
+        (labelChange)="fps.updateRoom($event.id, { label: $event.label })"/>
+    }
+
+    <!-- Station markers -->
+    @for (station of fps.stations(); track station.id) {
+      <app-station-marker
+        [station]="station"
+        (dragStart)="onStationDragStart($event)"
+        (delete)="fps.deleteStation($event)"
+        (labelChange)="fps.updateStation($event.id, { label: $event.label })"/>
+    }
+
+  </div>
+}

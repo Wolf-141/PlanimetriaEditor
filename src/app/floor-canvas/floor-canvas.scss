@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-background-tertiary, #f5f5f5);
+  cursor: grab;
+
+  &.grabbing { cursor: grabbing; }
+  &.placing   { cursor: crosshair; }
+}
+
+.drop-zone {
+  position: absolute;
+  inset: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.4);
+  z-index: 20;
+  transition: background 0.15s;
+
+  &:hover, &.drag-over {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  p     { font-size: 14px; color: rgba(0, 0, 0, 0.5); }
+  small { font-size: 12px; color: rgba(0, 0, 0, 0.35); }
+}
+
+.scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+}
+
+.floor-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.svg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}

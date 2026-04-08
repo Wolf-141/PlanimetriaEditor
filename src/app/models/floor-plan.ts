@@ -1,0 +1,43 @@
+export interface Room {
+  id: string;
+  label: string;
+  xPct: number;
+  yPct: number;
+}
+
+export interface Station {
+  id: string;
+  label: string;
+  xPct: number;
+  yPct: number;
+  roomId: string;
+}
+
+export interface ImageMeta {
+  filename: string;
+  naturalWidth: number;
+  naturalHeight: number;
+  dataUrl: string;
+}
+
+export type EditorMode = 'view' | 'placing-room' | 'placing-station';
+
+/** Shape of the exported JSON file */
+export interface FloorPlanExport {
+  exportedAt: string;
+  image: Omit<ImageMeta, 'dataUrl'>;
+  rooms: Array<{
+    id: string;
+    label: string;
+    position: { xPct: number; yPct: number };
+    stationIds: string[];
+  }>;
+  stations: Array<{
+    id: string;
+    label: string;
+    position: { xPct: number; yPct: number };
+    roomId: string;
+    roomLabel: string;
+  }>;
+  connections: Array<{ stationId: string; roomId: string }>;
+}

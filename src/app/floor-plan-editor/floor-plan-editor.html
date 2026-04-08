@@ -1,0 +1,105 @@
+<div class="editor">
+
+  <!-- ── Toolbar ─────────────────────────────────────────────────────── -->
+  <div class="toolbar">
+    <span class="title">Floor plan editor</span>
+
+    <div class="sep"></div>
+
+    <!-- Upload -->
+    <button (click)="fileInput.click()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2M8 2v8M5 5l3-3 3 3"/>
+      </svg>
+      Upload
+    </button>
+    <input #fileInput type="file" accept="image/*" style="display:none"
+           (change)="fps.loadImage($any($event.target).files[0])">
+
+    <!-- Add room -->
+    <button [class.active]="isPlacingRoom()" [disabled]="!hasImage()"
+            (click)="toggleRoomMode()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="4" width="12" height="9" rx="1"/>
+        <path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/>
+      </svg>
+      Add room
+    </button>
+
+    <div class="sep"></div>
+
+    <!-- Zoom out -->
+    <button [disabled]="!hasImage()" (click)="zoomOut()" title="Zoom out (scroll down)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="7" cy="7" r="4"/><path d="M5 7h4M11 11l2 2"/>
+      </svg>
+    </button>
+
+    <span class="zoom-pct">{{ zoomPercent() }}</span>
+
+    <!-- Zoom in -->
+    <button [disabled]="!hasImage()" (click)="zoomIn()" title="Zoom in (scroll up)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="7" cy="7" r="4"/><path d="M5 7h4M7 5v4M11 11l2 2"/>
+      </svg>
+    </button>
+
+    <!-- Reset view -->
+    <button [disabled]="!hasImage()" (click)="resetView()" title="Reset zoom & pan">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 8a5 5 0 105-5H5M5 1v3h3"/>
+      </svg>
+    </button>
+
+    <div class="sep"></div>
+
+    <!-- Export JSON -->
+    <button [disabled]="!hasImage()" (click)="exportJSON()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M10 2h3a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1h3"/>
+        <path d="M8 2v8M5 7l3 3 3-3"/>
+      </svg>
+      Export JSON
+    </button>
+
+    <!-- Clear all -->
+    @if (hasImage()) {
+      <button class="danger" (click)="clearAll()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 4l8 8M12 4l-8 8"/>
+        </svg>
+        Clear
+      </button>
+    }
+  </div>
+
+  <!-- ── Legend / hint bar ────────────────────────────────────────────── -->
+  @if (hasImage()) {
+    <div class="info-bar">
+      <span class="legend-item">
+        <span class="legend-dot room"></span>Room
+      </span>
+      <span class="legend-item">
+        <span class="legend-dot station"></span>Station
+      </span>
+      <span class="legend-item">
+        <svg width="16" height="10">
+          <line x1="0" y1="5" x2="16" y2="5" stroke="#3B6D11"
+                stroke-width="1.5" stroke-dasharray="4 2" opacity="0.8"/>
+        </svg>
+        Connection
+      </span>
+      <span class="hint">{{ hint() }}</span>
+    </div>
+  }
+
+  <!-- ── Canvas ───────────────────────────────────────────────────────── -->
+  <app-floor-canvas class="canvas"></app-floor-canvas>
+
+  <!-- ── Status bar ──────────────────────────────────────────────────── -->
+  <div class="status-bar">
+    <span>{{ roomCount() }} {{ roomCount() === 1 ? 'room' : 'rooms' }}</span>
+    <span>{{ stationCount() }} {{ stationCount() === 1 ? 'station' : 'stations' }}</span>
+  </div>
+
+</div>

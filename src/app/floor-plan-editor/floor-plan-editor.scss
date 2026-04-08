@@ -1,0 +1,128 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--font-sans, sans-serif);
+}
+
+// ── Toolbar ────────────────────────────────────────────────────────────────
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+  flex-shrink: 0;
+}
+
+.sep {
+  width: 0.5px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.12);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+button {
+  font-size: 12px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  &:hover:not(:disabled) { background: rgba(0, 0, 0, 0.05); }
+  &:active:not(:disabled) { transform: scale(0.98); }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  &.active {
+    background: #E6F1FB;
+    color: #185FA5;
+    border-color: #B5D4F4;
+  }
+
+  &.danger {
+    color: #A32D2D;
+    border-color: #F7C1C1;
+    &:hover:not(:disabled) { background: #FCEBEB; }
+  }
+}
+
+.zoom-pct {
+  font-size: 12px;
+  color: #666;
+  min-width: 38px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+// ── Info bar ───────────────────────────────────────────────────────────────
+.info-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 12px;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+  background: #fafafa;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #555;
+  svg { flex-shrink: 0; }
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  &.room    { background: #185FA5; }
+  &.station { background: #085041; }
+}
+
+.hint {
+  font-size: 11px;
+  color: #999;
+  margin-left: 4px;
+}
+
+// ── Canvas ─────────────────────────────────────────────────────────────────
+.canvas {
+  flex: 1;
+  min-height: 0; // critical for flex children with overflow
+}
+
+// ── Status bar ─────────────────────────────────────────────────────────────
+.status-bar {
+  display: flex;
+  gap: 16px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: #999;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  flex-shrink: 0;
+}
