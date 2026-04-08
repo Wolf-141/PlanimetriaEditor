@@ -8,9 +8,7 @@
 
     <!-- Upload -->
     <button (click)="fileInput.click()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2M8 2v8M5 5l3-3 3 3"/>
-      </svg>
+      <img src="/images/file.png" alt="upload file" width="16" height="16">
       Upload
     </button>
     <input #fileInput type="file" accept="image/*" style="display:none"
@@ -19,10 +17,7 @@
     <!-- Add room -->
     <button [class.active]="isPlacingRoom()" [disabled]="!hasImage()"
             (click)="toggleRoomMode()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="4" width="12" height="9" rx="1"/>
-        <path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/>
-      </svg>
+      <img src="/images/rounded-rectangle.png" alt="add room" width="16" height="16">
       Add room
     </button>
 
@@ -30,36 +25,27 @@
 
     <!-- Zoom out -->
     <button [disabled]="!hasImage()" (click)="zoomOut()" title="Zoom out (scroll down)">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="7" cy="7" r="4"/><path d="M5 7h4M11 11l2 2"/>
-      </svg>
+      <img src="/images/zoom-out.svg" alt="zoom out" width="16" height="16">
     </button>
 
     <span class="zoom-pct">{{ zoomPercent() }}</span>
 
     <!-- Zoom in -->
     <button [disabled]="!hasImage()" (click)="zoomIn()" title="Zoom in (scroll up)">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="7" cy="7" r="4"/><path d="M5 7h4M7 5v4M11 11l2 2"/>
-      </svg>
+      <img src="/images/zoom-in.svg" alt="zoom in" width="16" height="16">
     </button>
 
     <!-- Reset view -->
     <button [disabled]="!hasImage()" (click)="resetView()" title="Reset zoom & pan">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M3 8a5 5 0 105-5H5M5 1v3h3"/>
-      </svg>
+      <img src="/images/refresh.png" alt="reset zoom" width="16" height="16">
     </button>
 
     <div class="sep"></div>
 
     <!-- Export JSON -->
     <button [disabled]="!hasImage()" (click)="exportJSON()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M10 2h3a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1h3"/>
-        <path d="M8 2v8M5 7l3 3 3-3"/>
-      </svg>
-      Export JSON
+      <img src="/images/export.png" alt="exportJSON" width="16" height="16">
+      Export to JSON
     </button>
 
     <!-- Clear all -->
