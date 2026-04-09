@@ -11,8 +11,8 @@
       <img src="/images/file.png" alt="upload file" width="16" height="16">
       Upload
     </button>
-    <input #fileInput type="file" accept="image/*" style="display:none"
-           (change)="fps.loadImage($any($event.target).files[0])">
+    <input #fileInput type="file" accept="image/png,application/dxf,image/x-dxf,image/vnd.dxf,image/svg+xml,.dxf,.dwg," style="display:none"
+           (change)="fps.loadImage($any($event.target).files[0]); fileInput.value = ''">
 
     <!-- Import JSON -->
     <button (click)="jsonInput.click()" [disabled]="!hasImage()">

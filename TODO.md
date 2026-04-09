@@ -12,10 +12,10 @@
 
 - [ ] creare un pop-up di conferma quando clicchi sul tasto Clear, il pop-up deve avere "conferma" e "annulla", se clicchi conferma allora si cancella ma se clicchi su annulla non viene cancellato nulla.
 
-- [ ] Fixare bug che se clicchi sul tasto clear quando provi ad uploadare una nuova immagine non viene renderizzata.
+- [x] ~~Fixare bug che se clicchi sul tasto clear quando provi ad uploadare una nuova immagine non viene renderizzata.~~
 
 - [ ] Implementazione di hotkeys per utilizzare l'editor in modo più veloce.
 
 - [ ] Aggiornare la creazione del JSON (renderlo migliore).
 
-- [ ] Ottimizzare (quando muovi la mappa lagga).
+- [x] ~~Ottimizzare (quando muovi la mappa lagga).~~

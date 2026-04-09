@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, HostListener, inject,
-  computed, ViewChild, AfterViewInit,
+  ViewChild, AfterViewInit, effect, NgZone,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FloorPlanService } from '../services/floor-plan';
@@ -26,28 +26,47 @@ interface DragState {
 export class FloorCanvasComponent implements AfterViewInit {
   protected readonly fps = inject(FloorPlanService);
   private readonly elRef = inject(ElementRef<HTMLElement>);
+  private readonly ngZone = inject(NgZone);
 
-  @ViewChild('canvasEl') canvasEl!: ElementRef<HTMLElement>;
+  @ViewChild('sceneEl') sceneEl!: ElementRef<HTMLElement>;
 
   private dragState: DragState | null = null;
-  private isPanning = false;
-  private panMoved  = false;
-  private panStartX = 0;
-  private panStartY = 0;
+
+  // ── Panning state (kept outside Angular zone for zero-overhead mousemove) ──
+  private isPanning  = false;
+  private panMoved   = false;
+  private panStartX  = 0;
+  private panStartY  = 0;
   private panOriginX = 0;
   private panOriginY = 0;
+  /** Pending pan values to commit to the signal on mouseup. */
+  private pendingPan: { x: number; y: number } | null = null;
 
-  // Pre-compute transform string for the scene
-  readonly sceneTransform = computed(() => {
-    const { x, y } = this.fps.pan();
-    return `translate(${x}px, ${y}px) scale(${this.fps.zoom()})`;
-  });
-
-  readonly zoomPercent = computed(() => Math.round(this.fps.zoom() * 100) + '%');
+  constructor() {
+    /**
+     * Keep the scene element's transform in sync with the service signals.
+     * This runs whenever zoom or pan changes *via signals* (zoom buttons, reset,
+     * import…) but is intentionally NOT called during active panning — that path
+     * writes the transform directly to the DOM for maximum performance.
+     */
+    effect(() => {
+      const { x, y } = this.fps.pan();
+      const zoom = this.fps.zoom();
+      this.writeTransform(x, y, zoom);
+    });
+  }
 
   ngAfterViewInit(): void {
-    // Passive:false needed for wheel to call preventDefault
+    // passive:false is required so we can call preventDefault on wheel
     this.elRef.nativeElement.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
+
+    // Run mousemove and mouseup listeners outside Angular's zone so they never
+    // trigger change detection — the pan path writes the DOM directly and only
+    // re-enters the zone on mouseup to commit the final pan value.
+    this.ngZone.runOutsideAngular(() => {
+      document.addEventListener('mousemove', this.onMouseMoveOutside.bind(this));
+      document.addEventListener('mouseup',   this.onMouseUpOutside.bind(this));
+    });
   }
 
   // ── Canvas interaction ─────────────────────────────────────────────────
@@ -79,46 +98,68 @@ export class FloorCanvasComponent implements AfterViewInit {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
     if (target.closest('app-room-marker, app-station-marker')) return;
-    this.isPanning = true;
-    this.panMoved  = false;
-    this.panStartX = e.clientX;
-    this.panStartY = e.clientY;
-    const { x, y } = this.fps.pan();
+    this.isPanning  = true;
+    this.panMoved   = false;
+    this.panStartX  = e.clientX;
+    this.panStartY  = e.clientY;
+    const { x, y }  = this.fps.pan();
     this.panOriginX = x;
     this.panOriginY = y;
+    this.pendingPan = null;
     this.elRef.nativeElement.style.cursor = 'grabbing';
     e.preventDefault();
   }
 
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove(e: MouseEvent): void {
-    // ── Panning ──
+  /**
+   * Runs OUTSIDE Angular zone — no change detection cost.
+   * Only writes directly to the DOM during pan; marker drag re-enters the zone.
+   */
+  private onMouseMoveOutside(e: MouseEvent): void {
+    // ── Panning (zero CD cost) ──────────────────────────────────────────
     if (this.isPanning) {
       const dx = e.clientX - this.panStartX;
       const dy = e.clientY - this.panStartY;
       if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.panMoved = true;
-      if (this.panMoved) this.fps.setPan(this.panOriginX + dx, this.panOriginY + dy);
+      if (this.panMoved) {
+        const x = this.panOriginX + dx;
+        const y = this.panOriginY + dy;
+        this.writeTransform(x, y, this.fps.zoom());
+        this.pendingPan = { x, y };
+      }
       return;
     }
-    // ── Marker dragging ──
+
+    // ── Marker dragging (needs CD to move marker elements) ──────────────
     if (!this.dragState) return;
-    const zoom = this.fps.zoom();
-    const host = this.elRef.nativeElement;
-    const dx = (e.clientX - this.dragState.startMouseX) / zoom / host.offsetWidth  * 100;
-    const dy = (e.clientY - this.dragState.startMouseY) / zoom / host.offsetHeight * 100;
-    const xPct = clamp(this.dragState.startXPct + dx);
-    const yPct = clamp(this.dragState.startYPct + dy);
-    if (this.dragState.type === 'room') {
-      this.fps.updateRoom(this.dragState.id, { xPct, yPct });
-    } else {
-      this.fps.updateStation(this.dragState.id, { xPct, yPct });
-    }
+    this.ngZone.run(() => {
+      if (!this.dragState) return;
+      const zoom = this.fps.zoom();
+      const host = this.elRef.nativeElement;
+      const dx = (e.clientX - this.dragState.startMouseX) / zoom / host.offsetWidth  * 100;
+      const dy = (e.clientY - this.dragState.startMouseY) / zoom / host.offsetHeight * 100;
+      const xPct = clamp(this.dragState.startXPct + dx);
+      const yPct = clamp(this.dragState.startYPct + dy);
+      if (this.dragState.type === 'room') {
+        this.fps.updateRoom(this.dragState.id, { xPct, yPct });
+      } else {
+        this.fps.updateStation(this.dragState.id, { xPct, yPct });
+      }
+    });
   }
 
-  @HostListener('document:mouseup')
-  onMouseUp(): void {
+  /** Runs OUTSIDE Angular zone — commits pending pan to signal on release. */
+  private onMouseUpOutside(): void {
+    const wasPanning = this.isPanning;
     this.isPanning = false;
     this.dragState = null;
+
+    // Commit the final pan position to the signal (re-enters Angular zone once)
+    if (wasPanning && this.pendingPan) {
+      const { x, y } = this.pendingPan;
+      this.pendingPan = null;
+      this.ngZone.run(() => this.fps.setPan(x, y));
+    }
+
     const mode = this.fps.mode();
     this.elRef.nativeElement.style.cursor = mode !== 'view' ? 'crosshair' : 'grab';
   }
@@ -149,12 +190,12 @@ export class FloorCanvasComponent implements AfterViewInit {
   }
 
   // ── File input / drop ─────────────────────────────────────────────────
- 
+
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) this.fps.loadImage(file);
   }
- 
+
   onDrop(event: DragEvent): void {
     const file = event.dataTransfer?.files?.[0];
     if (file) this.fps.loadImage(file);
@@ -187,7 +228,12 @@ export class FloorCanvasComponent implements AfterViewInit {
     this.elRef.nativeElement.style.cursor = 'crosshair';
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────
+
+  private writeTransform(x: number, y: number, zoom: number): void {
+    const el = this.sceneEl?.nativeElement;
+    if (el) el.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+  }
 
   private hostRect() { return this.elRef.nativeElement.getBoundingClientRect(); }
 

@@ -28,7 +28,7 @@ export class FloorPlanService {
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
       const img = new Image();
-      img.onload = () => {
+      img.onload = () => { 
         this.image.set({
           filename: file.name,
           dataUrl,

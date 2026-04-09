@@ -12,11 +12,11 @@
 
 <!-- Hidden file input -->
 <input #fileInput type="file" accept="image/*" style="display:none"
-       (change)="onFileSelected($event)">
+       (change)="onFileSelected($event); fileInput.value = ''">
 
 <!-- Scene (transformed for zoom/pan) -->
 @if (fps.image(); as img) {
-  <div class="scene" [style.transform]="sceneTransform()">
+  <div #sceneEl class="scene">
 
     <!-- Floor plan image -->
     <img class="floor-img" [src]="img.dataUrl" draggable="false" alt="Floor plan">
