@@ -6,8 +6,6 @@
 
 - [x] ~~Implementazione del tasto "Add meeting rooms" per aggiungere stanze riunioni (dovrebbe funzionare come il tasto "Add rooms" ma nelle meeting rooms non puoi aggiungere postazioni).~~
 
-- [ ] Rendere visibili le postazioni solo se la stanza e selezionata e implementare un counter accanto al nome della stanza che conti le postazioni associate.
-
 - [x] ~~Lo station marker deve anche avere accanto al suo nome il nome della stanza a cui e associato.~~
 
 - [x] ~~Fare in modo che i marker possano essere aggiunti e mossi solo nei confini dell'immagine.~~
