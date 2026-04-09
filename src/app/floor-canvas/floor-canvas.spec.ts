@@ -44,6 +44,37 @@ describe('FloorCanvasComponent', () => {
     expect(compiled.querySelector('.floor-img')).not.toBeNull();
   });
 
+  it('should render the associated room name next to each station marker', () => {
+    service.image.set({
+      filename: 'plan.png',
+      dataUrl: 'data:image/png;base64,abc',
+      naturalWidth: 100,
+      naturalHeight: 100,
+    });
+    const room = service.addRoom(20, 30);
+    service.addStation(40, 50, room.id);
+
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain(room.label);
+  });
+
+  it('should render meeting room markers', () => {
+    service.image.set({
+      filename: 'plan.png',
+      dataUrl: 'data:image/png;base64,abc',
+      naturalWidth: 100,
+      naturalHeight: 100,
+    });
+    service.addMeeting(25, 35);
+
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Meeting Room');
+  });
+
   it('should only place markers inside the rendered image bounds', () => {
     setHostSize(fixture, 1000, 1000);
     service.image.set({
@@ -64,6 +95,25 @@ describe('FloorCanvasComponent', () => {
     expect(service.rooms()).toHaveLength(1);
     expect(service.rooms()[0].xPct).toBe(50);
     expect(service.rooms()[0].yPct).toBe(50);
+  });
+
+  it('should place meeting rooms when the meeting mode is active', () => {
+    setHostSize(fixture, 1000, 1000);
+    service.image.set({
+      filename: 'plan.png',
+      dataUrl: 'data:image/png;base64,abc',
+      naturalWidth: 100,
+      naturalHeight: 100,
+    });
+
+    fixture.detectChanges();
+    component.onWindowResize();
+    service.setMode('placing-meeting');
+
+    component.onClick(createMouseEvent(500, 500));
+
+    expect(service.meetings()).toHaveLength(1);
+    expect(service.stations()).toHaveLength(0);
   });
 
   it('should clamp marker dragging to the image bounds', () => {

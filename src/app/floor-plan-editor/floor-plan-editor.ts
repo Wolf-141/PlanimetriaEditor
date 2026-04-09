@@ -19,8 +19,10 @@ export class FloorPlanEditorComponent {
   readonly zoomPercent = computed(() => Math.round(this.fps.zoom() * 100) + '%');
   readonly hasImage = computed(() => !!this.fps.image());
   readonly roomCount = computed(() => this.fps.rooms().length);
+  readonly meetingCount = computed(() => this.fps.meetings().length);
   readonly stationCount = computed(() => this.fps.stations().length);
   readonly isPlacingRoom = computed(() => this.fps.mode() === 'placing-room');
+  readonly isPlacingMeeting = computed(() => this.fps.mode() === 'placing-meeting');
 
   /** Non-null when the import error modal should be shown. */
   readonly importError = signal<string | null>(null);
@@ -30,6 +32,8 @@ export class FloorPlanEditorComponent {
     switch (this.fps.mode()) {
       case 'placing-room':
         return 'Click the floor plan to place a room - Esc to cancel';
+      case 'placing-meeting':
+        return 'Click the floor plan to place a meeting room - Esc to cancel';
       case 'placing-station':
         return 'Click the floor plan to place the station - Esc to cancel';
       default:
@@ -40,6 +44,10 @@ export class FloorPlanEditorComponent {
   // Toolbar actions
   toggleRoomMode(): void {
     this.fps.setMode(this.fps.mode() === 'placing-room' ? 'view' : 'placing-room');
+  }
+
+  toggleMeetingMode(): void {
+    this.fps.setMode(this.fps.mode() === 'placing-meeting' ? 'view' : 'placing-meeting');
   }
 
   zoomIn(): void {
@@ -132,6 +140,19 @@ export class FloorPlanEditorComponent {
     }
     if (typeof img['naturalWidth'] !== 'number' || typeof img['naturalHeight'] !== 'number') {
       return 'Missing or invalid "image.naturalWidth" / "image.naturalHeight".';
+    }
+
+    if (!Array.isArray(d['meetings'])) {
+      return 'Missing or invalid "meetings" array.';
+    }
+    for (let i = 0; i < (d['meetings'] as unknown[]).length; i++) {
+      const m = (d['meetings'] as unknown[])[i] as Record<string, unknown>;
+      if (typeof m['id'] !== 'string') return `meetings[${i}]: missing "id".`;
+      if (typeof m['label'] !== 'string') return `meetings[${i}]: missing "label".`;
+      const pos = m['position'] as Record<string, unknown>;
+      if (!pos || typeof pos['xPct'] !== 'number' || typeof pos['yPct'] !== 'number') {
+        return `meetings[${i}]: missing or invalid "position".`;
+      }
     }
 
     if (!Array.isArray(d['rooms'])) {

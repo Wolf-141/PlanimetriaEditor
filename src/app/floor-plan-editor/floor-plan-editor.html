@@ -13,7 +13,7 @@
     <input
       #fileInput
       type="file"
-      accept="image/png,application/dxf,image/x-dxf,image/vnd.dxf,image/svg+xml,.dxf,.dwg,"
+      accept="image/png,application/dxf,image/x-dxf,image/vnd.dxf,image/svg+xml,.dxf,.dwg"
       style="display:none"
       (change)="fps.loadImage($any($event.target).files[0]); fileInput.value = ''"
     >
@@ -37,6 +37,12 @@
     <button [class.active]="isPlacingRoom()" [disabled]="!hasImage()" (click)="toggleRoomMode()">
       <img src="/images/rounded-rectangle.png" alt="add room" width="16" height="16">
       Add room
+    </button>
+
+    <!-- Add meeting room -->
+    <button [class.active]="isPlacingMeeting()" [disabled]="!hasImage()" (click)="toggleMeetingMode()">
+      <img src="/images/people.png" alt="add meeting room" width="16" height="16">
+      Add meeting room
     </button>
 
     <div class="sep"></div>
@@ -84,6 +90,9 @@
         <span class="legend-dot room"></span>Room
       </span>
       <span class="legend-item">
+        <span class="legend-dot meeting"></span>Meeting room
+      </span>
+      <span class="legend-item">
         <span class="legend-dot station"></span>Station
       </span>
       <span class="hint">{{ hint() }}</span>
@@ -96,6 +105,7 @@
   <!-- Status bar -->
   <div class="status-bar">
     <span>{{ roomCount() }} {{ roomCount() === 1 ? 'room' : 'rooms' }}</span>
+    <span>{{ meetingCount() }} {{ meetingCount() === 1 ? 'meeting room' : 'meeting rooms' }}</span>
     <span>{{ stationCount() }} {{ stationCount() === 1 ? 'station' : 'stations' }}</span>
   </div>
 
@@ -144,7 +154,7 @@
           <span>Clear floor plan?</span>
         </div>
         <p class="modal-body">
-          This will remove the current image, rooms, and stations. This action cannot be undone.
+          This will remove the current image, rooms, meeting rooms, and stations. This action cannot be undone.
         </p>
         <div class="modal-footer modal-footer--split">
           <button class="modal-btn modal-btn--secondary" (click)="cancelClear()">Cancel</button>

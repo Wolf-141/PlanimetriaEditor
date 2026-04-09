@@ -15,13 +15,19 @@ import { MarkerDragStart } from '../markers/room-marker';
   template: `
     <div class="dot"></div>
 
-    <span
-      class="label"
-      contenteditable="true"
-      spellcheck="false"
-      (mousedown)="$event.stopPropagation()"
-      (keydown)="onKeyDown($event)"
-      (blur)="onLabelBlur($event)">{{ station.label }}</span>
+    <div class="meta">
+      <span
+        class="label"
+        contenteditable="true"
+        spellcheck="false"
+        (mousedown)="$event.stopPropagation()"
+        (keydown)="onKeyDown($event)"
+        (blur)="onLabelBlur($event)">{{ station.label }}</span>
+
+      @if (roomLabel) {
+        <span class="room-label">{{ roomLabel }}</span>
+      }
+    </div>
 
     <button
       class="del-btn"
@@ -64,8 +70,24 @@ import { MarkerDragStart } from '../markers/room-marker';
         border: none;
         color: inherit;
         font: inherit;
-        min-width: 30px;
+        min-width: 10px;
         cursor: text;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .room-label {
+        font-size: 10px;
+        line-height: 1;
+        color: #dff7ee;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        padding: 2px 6px;
       }
 
       .del-btn {
@@ -93,6 +115,7 @@ import { MarkerDragStart } from '../markers/room-marker';
 })
 export class StationMarkerComponent {
   @Input({ required: true }) station!: Station;
+  @Input() roomLabel = '';
   @Input() zoom = 1;
 
   @Output() dragStart = new EventEmitter<MarkerDragStart>();

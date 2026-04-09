@@ -14,7 +14,7 @@ import { RoomMarkerComponent, MarkerDragStart } from '../markers/room-marker';
 import { StationMarkerComponent } from '../markers/station-marker';
 
 interface DragState {
-  type: 'room' | 'station';
+  type: 'room' | 'meeting' | 'station';
   id: string;
   startMouseX: number;
   startMouseY: number;
@@ -58,12 +58,6 @@ export class FloorCanvasComponent implements AfterViewInit {
   private pendingPan: { x: number; y: number } | null = null;
 
   constructor() {
-    /**
-     * Keep the scene element's transform in sync with the service signals.
-     * This runs whenever zoom or pan changes via signals (zoom buttons, reset,
-     * import...) but is intentionally not called during active panning - that path
-     * writes the transform directly to the DOM for maximum performance.
-     */
     effect(() => {
       const { x, y } = this.fps.pan();
       const zoom = this.fps.zoom();
@@ -81,9 +75,6 @@ export class FloorCanvasComponent implements AfterViewInit {
       passive: false,
     });
 
-    // Run mousemove and mouseup listeners outside Angular's zone so they never
-    // trigger change detection - the pan path writes the DOM directly and only
-    // re-enters the zone on mouseup to commit the final pan value.
     this.ngZone.runOutsideAngular(() => {
       document.addEventListener('mousemove', this.onMouseMoveOutside.bind(this));
       document.addEventListener('mouseup', this.onMouseUpOutside.bind(this));
@@ -138,7 +129,6 @@ export class FloorCanvasComponent implements AfterViewInit {
    * Only writes directly to the DOM during pan; marker drag re-enters the zone.
    */
   private onMouseMoveOutside(e: MouseEvent): void {
-    // Panning (zero CD cost)
     if (this.isPanning) {
       const dx = e.clientX - this.panStartX;
       const dy = e.clientY - this.panStartY;
@@ -152,7 +142,6 @@ export class FloorCanvasComponent implements AfterViewInit {
       return;
     }
 
-    // Marker dragging (needs CD to move marker elements)
     if (!this.dragState) return;
     this.ngZone.run(() => {
       if (!this.dragState) return;
@@ -165,6 +154,8 @@ export class FloorCanvasComponent implements AfterViewInit {
       const yPct = clamp(this.dragState.startYPct + dy);
       if (this.dragState.type === 'room') {
         this.fps.updateRoom(this.dragState.id, { xPct, yPct });
+      } else if (this.dragState.type === 'meeting') {
+        this.fps.updateMeeting(this.dragState.id, { xPct, yPct });
       } else {
         this.fps.updateStation(this.dragState.id, { xPct, yPct });
       }
@@ -199,6 +190,8 @@ export class FloorCanvasComponent implements AfterViewInit {
 
     if (mode === 'placing-room') {
       this.fps.addRoom(point.x, point.y);
+    } else if (mode === 'placing-meeting') {
+      this.fps.addMeeting(point.x, point.y);
     } else if (mode === 'placing-station') {
       const roomId = this.fps.pendingRoomId();
       if (roomId) {
@@ -235,6 +228,19 @@ export class FloorCanvasComponent implements AfterViewInit {
       startMouseY: event.mouseY,
       startXPct: room.xPct,
       startYPct: room.yPct,
+    };
+  }
+
+  onMeetingDragStart(event: MarkerDragStart): void {
+    const meeting = this.fps.meetings().find((m) => m.id === event.id);
+    if (!meeting) return;
+    this.dragState = {
+      type: 'meeting',
+      id: event.id,
+      startMouseX: event.mouseX,
+      startMouseY: event.mouseY,
+      startXPct: meeting.xPct,
+      startYPct: meeting.yPct,
     };
   }
 

@@ -27,21 +27,17 @@ export interface ImageMeta {
   dataUrl: string;
 }
 
-export type RoomType = 'normal' | 'meeting';
-
-export type EditorMode = 'view' | 'placing-room' | 'placing-station';
+export type EditorMode = 'view' | 'placing-room' | 'placing-meeting' | 'placing-station';
 
 /** Shape of the exported JSON file */
 export interface FloorPlanExport {
   exportedAt: string;
   image: Omit<ImageMeta, 'dataUrl'>;
-  /*
   meetings: Array<{
     id: string;
     label: string;
     position: { xPct: number; yPct: number };
   }>;
-  */
   rooms: Array<{
     id: string;
     label: string;

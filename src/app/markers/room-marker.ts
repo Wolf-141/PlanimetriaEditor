@@ -6,7 +6,7 @@ import {
   HostBinding,
   HostListener,
 } from '@angular/core';
-import { Room } from '../models/floor-plan';
+import { Meeting, Room } from '../models/floor-plan';
 
 export interface MarkerDragStart {
   id: string;
@@ -24,28 +24,28 @@ export interface MarkerDragStart {
       spellcheck="false"
       (mousedown)="$event.stopPropagation()"
       (keydown)="onKeyDown($event)"
-      (blur)="onLabelBlur($event)">{{ room.label }}</span>
+      (blur)="onLabelBlur($event)">{{ marker.label }}</span>
 
-    <button
-      class="plus-btn"
-      title="Add station to this room"
-      (mousedown)="$event.stopPropagation()"
-      (click)="$event.stopPropagation(); addStation.emit(room.id)">+</button>
+    @if (showAddStation) {
+      <button
+        class="plus-btn"
+        title="Add station to this room"
+        (mousedown)="$event.stopPropagation()"
+        (click)="$event.stopPropagation(); addStation.emit(marker.id)">+</button>
+    }
 
     <button
       class="del-btn"
-      title="Delete room"
+      [title]="deleteTitle"
       (mousedown)="$event.stopPropagation()"
-      (click)="$event.stopPropagation(); delete.emit(room.id)">x</button>
+      (click)="$event.stopPropagation(); delete.emit(marker.id)">x</button>
   `,
   styles: [
     `
       :host {
         position: absolute;
         transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
-        background: #185fa5;
         color: #e6f1fb;
-        border: 2px solid #0c447c;
         border-radius: 8px;
         padding: 5px 10px;
         font-size: 12px;
@@ -59,13 +59,24 @@ export interface MarkerDragStart {
         z-index: 10;
       }
 
+      :host(.room) {
+        background: #185fa5;
+        border: 2px solid #0c447c;
+      }
+
+      :host(.meeting) {
+        background: #9b5b00;
+        border: 2px solid #7a4300;
+        color: #fff1dc;
+      }
+
       .label {
         outline: none;
         background: transparent;
         border: none;
         color: inherit;
         font: inherit;
-        min-width: 36px;
+        min-width: 20px;
         cursor: text;
       }
 
@@ -75,7 +86,7 @@ export interface MarkerDragStart {
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.35);
-        color: #e6f1fb;
+        color: inherit;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -97,7 +108,7 @@ export interface MarkerDragStart {
         border-radius: 50%;
         background: rgba(0, 0, 0, 0.2);
         border: none;
-        color: #e6f1fb;
+        color: inherit;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -115,27 +126,48 @@ export interface MarkerDragStart {
   ],
 })
 export class RoomMarkerComponent {
-  @Input({ required: true }) room!: Room;
+  @Input() room?: Room;
+  @Input() meeting?: Meeting;
   @Input() zoom = 1;
+  @Input() showAddStation = true;
+  @Input() variant: 'room' | 'meeting' = 'room';
 
   @Output() dragStart = new EventEmitter<MarkerDragStart>();
   @Output() addStation = new EventEmitter<string>();
   @Output() delete = new EventEmitter<string>();
   @Output() labelChange = new EventEmitter<{ id: string; label: string }>();
 
+  get marker(): Room | Meeting {
+    return this.room ?? this.meeting!;
+  }
+
+  get deleteTitle(): string {
+    return this.variant === 'meeting' ? 'Delete meeting room' : 'Delete room';
+  }
+
   @HostBinding('style.left')
   get left() {
-    return this.room.xPct + '%';
+    return this.marker.xPct + '%';
   }
 
   @HostBinding('style.top')
   get top() {
-    return this.room.yPct + '%';
+    return this.marker.yPct + '%';
   }
 
   @HostBinding('style.--marker-scale')
   get markerScale() {
     return 1 / this.zoom;
+  }
+
+  @HostBinding('class.room')
+  get roomClass() {
+    return this.variant === 'room';
+  }
+
+  @HostBinding('class.meeting')
+  get meetingClass() {
+    return this.variant === 'meeting';
   }
 
   @HostListener('mousedown', ['$event'])
@@ -144,7 +176,7 @@ export class RoomMarkerComponent {
     if (target.closest('.label, .plus-btn, .del-btn')) return;
     e.preventDefault();
     e.stopPropagation();
-    this.dragStart.emit({ id: this.room.id, mouseX: e.clientX, mouseY: e.clientY });
+    this.dragStart.emit({ id: this.marker.id, mouseX: e.clientX, mouseY: e.clientY });
   }
 
   onKeyDown(e: KeyboardEvent): void {
@@ -156,8 +188,8 @@ export class RoomMarkerComponent {
 
   onLabelBlur(e: FocusEvent): void {
     const text = (e.target as HTMLElement).textContent?.trim() ?? '';
-    if (text && text !== this.room.label) {
-      this.labelChange.emit({ id: this.room.id, label: text });
+    if (text && text !== this.marker.label) {
+      this.labelChange.emit({ id: this.marker.id, label: text });
     }
   }
 }

@@ -1,10 +1,11 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Room, Station, EditorMode, ImageMeta, FloorPlanExport } from '../models/floor-plan';
+import { Meeting, Room, Station, EditorMode, ImageMeta, FloorPlanExport } from '../models/floor-plan';
 
 @Injectable({ providedIn: 'root' })
 export class FloorPlanService {
   // State
   readonly rooms = signal<Room[]>([]);
+  readonly meetings = signal<Meeting[]>([]);
   readonly stations = signal<Station[]>([]);
   readonly mode = signal<EditorMode>('view');
   readonly pendingRoomId = signal<string | null>(null);
@@ -16,6 +17,12 @@ export class FloorPlanService {
   readonly roomMap = computed<Record<string, Room>>(() => {
     const map: Record<string, Room> = {};
     this.rooms().forEach((r) => (map[r.id] = r));
+    return map;
+  });
+
+  readonly meetingMap = computed<Record<string, Meeting>>(() => {
+    const map: Record<string, Meeting> = {};
+    this.meetings().forEach((m) => (map[m.id] = m));
     return map;
   });
 
@@ -64,13 +71,33 @@ export class FloorPlanService {
     this.stations.update((ss) => ss.filter((s) => s.roomId !== id));
   }
 
+  // Meetings
+  addMeeting(xPct: number, yPct: number): Meeting {
+    const meeting: Meeting = {
+      id: uid('meeting'),
+      label: `Meeting Room ${this.meetings().length + 1}`,
+      xPct,
+      yPct,
+    };
+    this.meetings.update((ms) => [...ms, meeting]);
+    return meeting;
+  }
+
+  updateMeeting(id: string, patch: Partial<Pick<Meeting, 'label' | 'xPct' | 'yPct'>>): void {
+    this.meetings.update((ms) => ms.map((m) => (m.id === id ? { ...m, ...patch } : m)));
+  }
+
+  deleteMeeting(id: string): void {
+    this.meetings.update((ms) => ms.filter((m) => m.id !== id));
+  }
+
   // Stations
   addStation(xPct: number, yPct: number, roomId: string): Station {
     const room = this.rooms().find((r) => r.id === roomId);
     const idx = this.stations().filter((s) => s.roomId === roomId).length + 1;
     const station: Station = {
       id: uid('stn'),
-      label: `${room?.label ?? 'Room'} - Station ${idx}`,
+      label: `Station ${idx}`,
       xPct,
       yPct,
       roomId,
@@ -116,6 +143,13 @@ export class FloorPlanService {
 
   // Import
   importFromExport(data: FloorPlanExport): void {
+    const meetings: Meeting[] = data.meetings.map((m) => ({
+      id: m.id,
+      label: m.label,
+      xPct: m.position.xPct,
+      yPct: m.position.yPct,
+    }));
+
     const rooms: Room[] = data.rooms.map((r) => ({
       id: r.id,
       label: r.label,
@@ -131,6 +165,7 @@ export class FloorPlanService {
       roomId: s.roomId,
     }));
 
+    this.meetings.set(meetings);
     this.rooms.set(rooms);
     this.stations.set(stations);
     this.setMode('view');
@@ -140,6 +175,7 @@ export class FloorPlanService {
   // Misc
   clearAll(): void {
     this.rooms.set([]);
+    this.meetings.set([]);
     this.stations.set([]);
     this.image.set(null);
     this.setMode('view');
@@ -147,6 +183,7 @@ export class FloorPlanService {
 
   buildExport(): FloorPlanExport {
     const img = this.image();
+    const meetings = this.meetings();
     const rooms = this.rooms();
     const stations = this.stations();
     return {
@@ -156,6 +193,11 @@ export class FloorPlanService {
         naturalWidth: img?.naturalWidth ?? 0,
         naturalHeight: img?.naturalHeight ?? 0,
       },
+      meetings: meetings.map((m) => ({
+        id: m.id,
+        label: m.label,
+        position: { xPct: round3(m.xPct), yPct: round3(m.yPct) },
+      })),
       rooms: rooms.map((r) => ({
         id: r.id,
         label: r.label,

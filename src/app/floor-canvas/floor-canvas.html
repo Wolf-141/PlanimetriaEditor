@@ -16,7 +16,7 @@
 <input
   #fileInput
   type="file"
-  accept="image/*"
+  accept="image/png,application/dxf,image/x-dxf,image/vnd.dxf,image/svg+xml,.dxf,.dwg"
   style="display:none"
   (change)="onFileSelected($event); fileInput.value = ''"
 >
@@ -38,6 +38,8 @@
       @for (room of fps.rooms(); track room.id) {
         <app-room-marker
           [room]="room"
+          variant="room"
+          [showAddStation]="true"
           [zoom]="fps.zoom()"
           (dragStart)="onRoomDragStart($event)"
           (addStation)="onAddStation($event)"
@@ -46,10 +48,24 @@
         />
       }
 
+      <!-- Meeting room markers -->
+      @for (meeting of fps.meetings(); track meeting.id) {
+        <app-room-marker
+          [meeting]="meeting"
+          variant="meeting"
+          [showAddStation]="false"
+          [zoom]="fps.zoom()"
+          (dragStart)="onMeetingDragStart($event)"
+          (delete)="fps.deleteMeeting($event)"
+          (labelChange)="fps.updateMeeting($event.id, { label: $event.label })"
+        />
+      }
+
       <!-- Station markers -->
       @for (station of fps.stations(); track station.id) {
         <app-station-marker
           [station]="station"
+          [roomLabel]="fps.roomMap()[station.roomId]?.label ?? ''"
           [zoom]="fps.zoom()"
           (dragStart)="onStationDragStart($event)"
           (delete)="fps.deleteStation($event)"
