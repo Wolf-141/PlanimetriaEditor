@@ -1,46 +1,61 @@
 <!-- Drop zone (shown when no image loaded) -->
 @if (!fps.image()) {
-  <div class="drop-zone"
-       (click)="fileInput.click()"
-       (dragover)="$event.preventDefault()"
-       (drop)="$event.preventDefault(); onDrop($event)">
+  <div
+    class="drop-zone"
+    (click)="fileInput.click()"
+    (dragover)="$event.preventDefault()"
+    (drop)="$event.preventDefault(); onDrop($event)"
+  >
     <img src="/images/plan.png" alt="floor plan" width="32" height="32">
     <p>Drop floor plan here</p>
-    <small>PNG, SVG, DXF · Click to browse</small>
+    <small>PNG, SVG, DXF - Click to browse</small>
   </div>
 }
 
 <!-- Hidden file input -->
-<input #fileInput type="file" accept="image/*" style="display:none"
-       (change)="onFileSelected($event); fileInput.value = ''">
+<input
+  #fileInput
+  type="file"
+  accept="image/*"
+  style="display:none"
+  (change)="onFileSelected($event); fileInput.value = ''"
+>
 
 <!-- Scene (transformed for zoom/pan) -->
 @if (fps.image(); as img) {
   <div #sceneEl class="scene">
+    <div
+      class="image-frame"
+      [style.left.px]="imageFrame.left"
+      [style.top.px]="imageFrame.top"
+      [style.width.px]="imageFrame.width"
+      [style.height.px]="imageFrame.height"
+    >
+      <!-- Floor plan image -->
+      <img class="floor-img" [src]="img.dataUrl" draggable="false" alt="Floor plan">
 
-    <!-- Floor plan image -->
-    <img class="floor-img" [src]="img.dataUrl" draggable="false" alt="Floor plan">
+      <!-- Room markers -->
+      @for (room of fps.rooms(); track room.id) {
+        <app-room-marker
+          [room]="room"
+          [zoom]="fps.zoom()"
+          (dragStart)="onRoomDragStart($event)"
+          (addStation)="onAddStation($event)"
+          (delete)="fps.deleteRoom($event)"
+          (labelChange)="fps.updateRoom($event.id, { label: $event.label })"
+        />
+      }
 
-    <!-- Room markers -->
-    @for (room of fps.rooms(); track room.id) {
-      <app-room-marker
-        [room]="room"
-        [zoom]="fps.zoom()"
-        (dragStart)="onRoomDragStart($event)"
-        (addStation)="onAddStation($event)"
-        (delete)="fps.deleteRoom($event)"
-        (labelChange)="fps.updateRoom($event.id, { label: $event.label })"/>
-    }
-
-    <!-- Station markers -->
-    @for (station of fps.stations(); track station.id) {
-      <app-station-marker
-        [station]="station"
-        [zoom]="fps.zoom()"
-        (dragStart)="onStationDragStart($event)"
-        (delete)="fps.deleteStation($event)"
-        (labelChange)="fps.updateStation($event.id, { label: $event.label })"/>
-    }
-
+      <!-- Station markers -->
+      @for (station of fps.stations(); track station.id) {
+        <app-station-marker
+          [station]="station"
+          [zoom]="fps.zoom()"
+          (dragStart)="onStationDragStart($event)"
+          (delete)="fps.deleteStation($event)"
+          (labelChange)="fps.updateStation($event.id, { label: $event.label })"
+        />
+      }
+    </div>
   </div>
 }

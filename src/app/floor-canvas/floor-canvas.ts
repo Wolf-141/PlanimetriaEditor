@@ -1,6 +1,12 @@
 import {
-  Component, ElementRef, HostListener, inject,
-  ViewChild, AfterViewInit, effect, NgZone,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  ViewChild,
+  AfterViewInit,
+  effect,
+  NgZone,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FloorPlanService } from '../services/floor-plan';
@@ -14,6 +20,13 @@ interface DragState {
   startMouseY: number;
   startXPct: number;
   startYPct: number;
+}
+
+interface ImageFrame {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 }
 
 @Component({
@@ -30,13 +43,15 @@ export class FloorCanvasComponent implements AfterViewInit {
 
   @ViewChild('sceneEl') sceneEl!: ElementRef<HTMLElement>;
 
+  protected imageFrame: ImageFrame = { left: 0, top: 0, width: 0, height: 0 };
+
   private dragState: DragState | null = null;
 
-  // ── Panning state (kept outside Angular zone for zero-overhead mousemove) ──
-  private isPanning  = false;
-  private panMoved   = false;
-  private panStartX  = 0;
-  private panStartY  = 0;
+  // Panning state (kept outside Angular zone for zero-overhead mousemove)
+  private isPanning = false;
+  private panMoved = false;
+  private panStartX = 0;
+  private panStartY = 0;
   private panOriginX = 0;
   private panOriginY = 0;
   /** Pending pan values to commit to the signal on mouseup. */
@@ -45,8 +60,8 @@ export class FloorCanvasComponent implements AfterViewInit {
   constructor() {
     /**
      * Keep the scene element's transform in sync with the service signals.
-     * This runs whenever zoom or pan changes *via signals* (zoom buttons, reset,
-     * import…) but is intentionally NOT called during active panning — that path
+     * This runs whenever zoom or pan changes via signals (zoom buttons, reset,
+     * import...) but is intentionally not called during active panning - that path
      * writes the transform directly to the DOM for maximum performance.
      */
     effect(() => {
@@ -54,31 +69,39 @@ export class FloorCanvasComponent implements AfterViewInit {
       const zoom = this.fps.zoom();
       this.writeTransform(x, y, zoom);
     });
-  }
 
-  ngAfterViewInit(): void {
-    // passive:false is required so we can call preventDefault on wheel
-    this.elRef.nativeElement.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
-
-    // Run mousemove and mouseup listeners outside Angular's zone so they never
-    // trigger change detection — the pan path writes the DOM directly and only
-    // re-enters the zone on mouseup to commit the final pan value.
-    this.ngZone.runOutsideAngular(() => {
-      document.addEventListener('mousemove', this.onMouseMoveOutside.bind(this));
-      document.addEventListener('mouseup',   this.onMouseUpOutside.bind(this));
+    effect(() => {
+      this.fps.image();
+      this.updateImageFrame();
     });
   }
 
-  // ── Canvas interaction ─────────────────────────────────────────────────
+  ngAfterViewInit(): void {
+    this.elRef.nativeElement.addEventListener('wheel', this.onWheel.bind(this), {
+      passive: false,
+    });
 
+    // Run mousemove and mouseup listeners outside Angular's zone so they never
+    // trigger change detection - the pan path writes the DOM directly and only
+    // re-enters the zone on mouseup to commit the final pan value.
+    this.ngZone.runOutsideAngular(() => {
+      document.addEventListener('mousemove', this.onMouseMoveOutside.bind(this));
+      document.addEventListener('mouseup', this.onMouseUpOutside.bind(this));
+    });
+
+    this.updateImageFrame();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateImageFrame();
+  }
+
+  // Canvas interaction
   private onWheel(e: WheelEvent): void {
     e.preventDefault();
     const rect = this.hostRect();
-    this.fps.applyZoom(
-      e.deltaY < 0 ? 1.1 : 0.9,
-      e.clientX - rect.left,
-      e.clientY - rect.top,
-    );
+    this.fps.applyZoom(e.deltaY < 0 ? 1.1 : 0.9, e.clientX - rect.left, e.clientY - rect.top);
   }
 
   /** Called by toolbar zoom-in button */
@@ -98,11 +121,11 @@ export class FloorCanvasComponent implements AfterViewInit {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
     if (target.closest('app-room-marker, app-station-marker')) return;
-    this.isPanning  = true;
-    this.panMoved   = false;
-    this.panStartX  = e.clientX;
-    this.panStartY  = e.clientY;
-    const { x, y }  = this.fps.pan();
+    this.isPanning = true;
+    this.panMoved = false;
+    this.panStartX = e.clientX;
+    this.panStartY = e.clientY;
+    const { x, y } = this.fps.pan();
     this.panOriginX = x;
     this.panOriginY = y;
     this.pendingPan = null;
@@ -111,11 +134,11 @@ export class FloorCanvasComponent implements AfterViewInit {
   }
 
   /**
-   * Runs OUTSIDE Angular zone — no change detection cost.
+   * Runs outside Angular zone - no change detection cost.
    * Only writes directly to the DOM during pan; marker drag re-enters the zone.
    */
   private onMouseMoveOutside(e: MouseEvent): void {
-    // ── Panning (zero CD cost) ──────────────────────────────────────────
+    // Panning (zero CD cost)
     if (this.isPanning) {
       const dx = e.clientX - this.panStartX;
       const dy = e.clientY - this.panStartY;
@@ -129,14 +152,15 @@ export class FloorCanvasComponent implements AfterViewInit {
       return;
     }
 
-    // ── Marker dragging (needs CD to move marker elements) ──────────────
+    // Marker dragging (needs CD to move marker elements)
     if (!this.dragState) return;
     this.ngZone.run(() => {
       if (!this.dragState) return;
       const zoom = this.fps.zoom();
-      const host = this.elRef.nativeElement;
-      const dx = (e.clientX - this.dragState.startMouseX) / zoom / host.offsetWidth  * 100;
-      const dy = (e.clientY - this.dragState.startMouseY) / zoom / host.offsetHeight * 100;
+      const { width, height } = this.imageFrame;
+      if (!width || !height) return;
+      const dx = ((e.clientX - this.dragState.startMouseX) / zoom / width) * 100;
+      const dy = ((e.clientY - this.dragState.startMouseY) / zoom / height) * 100;
       const xPct = clamp(this.dragState.startXPct + dx);
       const yPct = clamp(this.dragState.startYPct + dy);
       if (this.dragState.type === 'room') {
@@ -147,13 +171,12 @@ export class FloorCanvasComponent implements AfterViewInit {
     });
   }
 
-  /** Runs OUTSIDE Angular zone — commits pending pan to signal on release. */
+  /** Runs outside Angular zone - commits pending pan to signal on release. */
   private onMouseUpOutside(): void {
     const wasPanning = this.isPanning;
     this.isPanning = false;
     this.dragState = null;
 
-    // Commit the final pan position to the signal (re-enters Angular zone once)
     if (wasPanning && this.pendingPan) {
       const { x, y } = this.pendingPan;
       this.pendingPan = null;
@@ -170,15 +193,16 @@ export class FloorCanvasComponent implements AfterViewInit {
     const target = e.target as HTMLElement;
     if (target.closest('app-room-marker, app-station-marker')) return;
 
-    const { x: px, y: py } = this.toScenePct(e.clientX, e.clientY);
+    const point = this.toImagePct(e.clientX, e.clientY);
+    if (!point) return;
     const mode = this.fps.mode();
 
     if (mode === 'placing-room') {
-      this.fps.addRoom(px, py);
+      this.fps.addRoom(point.x, point.y);
     } else if (mode === 'placing-station') {
       const roomId = this.fps.pendingRoomId();
       if (roomId) {
-        this.fps.addStation(px, py, roomId);
+        this.fps.addStation(point.x, point.y, roomId);
         this.fps.setMode('view');
       }
     }
@@ -189,8 +213,7 @@ export class FloorCanvasComponent implements AfterViewInit {
     this.fps.setMode('view');
   }
 
-  // ── File input / drop ─────────────────────────────────────────────────
-
+  // File input / drop
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) this.fps.loadImage(file);
@@ -201,25 +224,30 @@ export class FloorCanvasComponent implements AfterViewInit {
     if (file) this.fps.loadImage(file);
   }
 
-  // ── Marker events ──────────────────────────────────────────────────────
-
+  // Marker events
   onRoomDragStart(event: MarkerDragStart): void {
-    const room = this.fps.rooms().find(r => r.id === event.id);
+    const room = this.fps.rooms().find((r) => r.id === event.id);
     if (!room) return;
     this.dragState = {
-      type: 'room', id: event.id,
-      startMouseX: event.mouseX, startMouseY: event.mouseY,
-      startXPct: room.xPct, startYPct: room.yPct,
+      type: 'room',
+      id: event.id,
+      startMouseX: event.mouseX,
+      startMouseY: event.mouseY,
+      startXPct: room.xPct,
+      startYPct: room.yPct,
     };
   }
 
   onStationDragStart(event: MarkerDragStart): void {
-    const station = this.fps.stations().find(s => s.id === event.id);
+    const station = this.fps.stations().find((s) => s.id === event.id);
     if (!station) return;
     this.dragState = {
-      type: 'station', id: event.id,
-      startMouseX: event.mouseX, startMouseY: event.mouseY,
-      startXPct: station.xPct, startYPct: station.yPct,
+      type: 'station',
+      id: event.id,
+      startMouseX: event.mouseX,
+      startMouseY: event.mouseY,
+      startXPct: station.xPct,
+      startYPct: station.yPct,
     };
   }
 
@@ -228,23 +256,56 @@ export class FloorCanvasComponent implements AfterViewInit {
     this.elRef.nativeElement.style.cursor = 'crosshair';
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────
-
+  // Helpers
   private writeTransform(x: number, y: number, zoom: number): void {
     const el = this.sceneEl?.nativeElement;
     if (el) el.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
   }
 
-  private hostRect() { return this.elRef.nativeElement.getBoundingClientRect(); }
+  private hostRect() {
+    return this.elRef.nativeElement.getBoundingClientRect();
+  }
 
-  private toScenePct(clientX: number, clientY: number): { x: number; y: number } {
+  private updateImageFrame(): void {
+    const image = this.fps.image();
+    const host = this.elRef.nativeElement;
+    const hostWidth = host.clientWidth;
+    const hostHeight = host.clientHeight;
+
+    if (!image || !hostWidth || !hostHeight || !image.naturalWidth || !image.naturalHeight) {
+      this.imageFrame = { left: 0, top: 0, width: 0, height: 0 };
+      return;
+    }
+
+    const scale = Math.min(hostWidth / image.naturalWidth, hostHeight / image.naturalHeight);
+    const width = image.naturalWidth * scale;
+    const height = image.naturalHeight * scale;
+
+    this.imageFrame = {
+      left: (hostWidth - width) / 2,
+      top: (hostHeight - height) / 2,
+      width,
+      height,
+    };
+  }
+
+  private toImagePct(clientX: number, clientY: number): { x: number; y: number } | null {
     const rect = this.hostRect();
     const { x: panX, y: panY } = this.fps.pan();
     const zoom = this.fps.zoom();
-    const host = this.elRef.nativeElement;
+    const { left, top, width, height } = this.imageFrame;
+    if (!width || !height) return null;
+
+    const sceneX = (clientX - rect.left - panX) / zoom;
+    const sceneY = (clientY - rect.top - panY) / zoom;
+    const xPct = ((sceneX - left) / width) * 100;
+    const yPct = ((sceneY - top) / height) * 100;
+
+    if (xPct < 0 || xPct > 100 || yPct < 0 || yPct > 100) return null;
+
     return {
-      x: ((clientX - rect.left - panX) / zoom / host.offsetWidth)  * 100,
-      y: ((clientY - rect.top  - panY) / zoom / host.offsetHeight) * 100,
+      x: xPct,
+      y: yPct,
     };
   }
 }

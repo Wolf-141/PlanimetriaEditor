@@ -1,6 +1,10 @@
 import {
-  Component, Input, Output, EventEmitter,
-  HostBinding, HostListener,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  HostBinding,
+  HostListener,
 } from '@angular/core';
 import { Station } from '../models/floor-plan';
 import { MarkerDragStart } from '../markers/room-marker';
@@ -23,75 +27,92 @@ import { MarkerDragStart } from '../markers/room-marker';
       class="del-btn"
       title="Delete station"
       (mousedown)="$event.stopPropagation()"
-      (click)="$event.stopPropagation(); delete.emit(station.id)">✕</button>
+      (click)="$event.stopPropagation(); delete.emit(station.id)">x</button>
   `,
-  styles: [`
-    :host {
-      position: absolute;
-      transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
-      background: #085041;
-      color: #9FE1CB;
-      border: 1.5px solid #0F6E56;
-      border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 11px;
-      font-weight: 500;
-      cursor: move;
-      user-select: none;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      z-index: 9;
-    }
+  styles: [
+    `
+      :host {
+        position: absolute;
+        transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
+        background: #085041;
+        color: #9fe1cb;
+        border: 1.5px solid #0f6e56;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: move;
+        user-select: none;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        z-index: 9;
+      }
 
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #5DCAA5;
-      flex-shrink: 0;
-    }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #5dcaa5;
+        flex-shrink: 0;
+      }
 
-    .label {
-      outline: none;
-      background: transparent;
-      border: none;
-      color: inherit;
-      font: inherit;
-      min-width: 30px;
-      cursor: text;
-    }
+      .label {
+        outline: none;
+        background: transparent;
+        border: none;
+        color: inherit;
+        font: inherit;
+        min-width: 30px;
+        cursor: text;
+      }
 
-    .del-btn {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.25);
-      border: none;
-      color: #9FE1CB;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 8px;
-      cursor: pointer;
-      padding: 0;
-      flex-shrink: 0;
-    }
-    .del-btn:hover { background: #A32D2D; color: #FCEBEB; }
-  `],
+      .del-btn {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.25);
+        border: none;
+        color: #9fe1cb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+      }
+
+      .del-btn:hover {
+        background: #a32d2d;
+        color: #fcebeb;
+      }
+    `,
+  ],
 })
 export class StationMarkerComponent {
   @Input({ required: true }) station!: Station;
   @Input() zoom = 1;
 
-  @Output() dragStart   = new EventEmitter<MarkerDragStart>();
-  @Output() delete      = new EventEmitter<string>();  // stationId
+  @Output() dragStart = new EventEmitter<MarkerDragStart>();
+  @Output() delete = new EventEmitter<string>();
   @Output() labelChange = new EventEmitter<{ id: string; label: string }>();
 
-  @HostBinding('style.left') get left() { return this.station.xPct + '%'; }
-  @HostBinding('style.top')  get top()  { return this.station.yPct + '%'; }
-  @HostBinding('style.--marker-scale') get markerScale() { return 1 / this.zoom; }
+  @HostBinding('style.left')
+  get left() {
+    return this.station.xPct + '%';
+  }
+
+  @HostBinding('style.top')
+  get top() {
+    return this.station.yPct + '%';
+  }
+
+  @HostBinding('style.--marker-scale')
+  get markerScale() {
+    return 1 / this.zoom;
+  }
 
   @HostListener('mousedown', ['$event'])
   onHostMouseDown(e: MouseEvent): void {
@@ -103,7 +124,10 @@ export class StationMarkerComponent {
   }
 
   onKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLElement).blur(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      (e.target as HTMLElement).blur();
+    }
   }
 
   onLabelBlur(e: FocusEvent): void {

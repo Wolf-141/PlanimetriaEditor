@@ -1,6 +1,5 @@
 <div class="editor">
-
-  <!-- ── Toolbar ─────────────────────────────────────────────────────── -->
+  <!-- Toolbar -->
   <div class="toolbar">
     <span class="title">Floor plan editor</span>
 
@@ -11,22 +10,31 @@
       <img src="/images/file.png" alt="upload file" width="16" height="16">
       Upload
     </button>
-    <input #fileInput type="file" accept="image/png,application/dxf,image/x-dxf,image/vnd.dxf,image/svg+xml,.dxf,.dwg," style="display:none"
-           (change)="fps.loadImage($any($event.target).files[0]); fileInput.value = ''">
+    <input
+      #fileInput
+      type="file"
+      accept="image/png,application/dxf,image/x-dxf,image/vnd.dxf,image/svg+xml,.dxf,.dwg,"
+      style="display:none"
+      (change)="fps.loadImage($any($event.target).files[0]); fileInput.value = ''"
+    >
 
     <!-- Import JSON -->
     <button (click)="jsonInput.click()" [disabled]="!hasImage()">
       <img src="/images/import.png" alt="importJSON" width="16" height="16">
       Import from JSON
     </button>
-    <input #jsonInput type="file" accept="application/json,.json" style="display:none"
-           (change)="importJSON($any($event.target).files[0]); jsonInput.value = ''">
-    
+    <input
+      #jsonInput
+      type="file"
+      accept="application/json,.json"
+      style="display:none"
+      (change)="importJSON($any($event.target).files[0]); jsonInput.value = ''"
+    >
+
     <div class="sep"></div>
 
     <!-- Add room -->
-    <button [class.active]="isPlacingRoom()" [disabled]="!hasImage()"
-            (click)="toggleRoomMode()">
+    <button [class.active]="isPlacingRoom()" [disabled]="!hasImage()" (click)="toggleRoomMode()">
       <img src="/images/rounded-rectangle.png" alt="add room" width="16" height="16">
       Add room
     </button>
@@ -60,16 +68,16 @@
 
     <!-- Clear all -->
     @if (hasImage()) {
-      <button class="danger" (click)="clearAll()">
+      <button class="danger" (click)="openClearConfirmation()">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M4 4l8 8M12 4l-8 8"/>
+          <path d="M4 4l8 8M12 4l-8 8" />
         </svg>
         Clear
       </button>
     }
   </div>
 
-  <!-- ── Legend / hint bar ────────────────────────────────────────────── -->
+  <!-- Legend / hint bar -->
   @if (hasImage()) {
     <div class="info-bar">
       <span class="legend-item">
@@ -82,23 +90,30 @@
     </div>
   }
 
-  <!-- ── Canvas ───────────────────────────────────────────────────────── -->
+  <!-- Canvas -->
   <app-floor-canvas class="canvas"></app-floor-canvas>
 
-  <!-- ── Status bar ──────────────────────────────────────────────────── -->
+  <!-- Status bar -->
   <div class="status-bar">
     <span>{{ roomCount() }} {{ roomCount() === 1 ? 'room' : 'rooms' }}</span>
     <span>{{ stationCount() }} {{ stationCount() === 1 ? 'station' : 'stations' }}</span>
   </div>
 
-  <!-- ── Import error modal ───────────────────────────────────────────── -->
+  <!-- Import error modal -->
   @if (importError()) {
     <div class="modal-backdrop" (click)="importError.set(null)">
       <div class="modal-box" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18">
-            <circle cx="10" cy="10" r="8"/>
-            <path d="M10 6v4M10 13.5v.5"/>
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            width="18"
+            height="18"
+          >
+            <circle cx="10" cy="10" r="8" />
+            <path d="M10 6v4M10 13.5v.5" />
           </svg>
           <span>Import failed</span>
         </div>
@@ -110,4 +125,32 @@
     </div>
   }
 
+  <!-- Clear confirmation modal -->
+  @if (confirmClear()) {
+    <div class="modal-backdrop" (click)="cancelClear()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header--warning">
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            width="18"
+            height="18"
+          >
+            <path d="M10 2.75L17.25 16.5H2.75L10 2.75Z" />
+            <path d="M10 7.25V11.25M10 14.25V14.75" />
+          </svg>
+          <span>Clear floor plan?</span>
+        </div>
+        <p class="modal-body">
+          This will remove the current image, rooms, and stations. This action cannot be undone.
+        </p>
+        <div class="modal-footer modal-footer--split">
+          <button class="modal-btn modal-btn--secondary" (click)="cancelClear()">Cancel</button>
+          <button class="modal-btn modal-btn--danger" (click)="clearAll()">Confirm</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

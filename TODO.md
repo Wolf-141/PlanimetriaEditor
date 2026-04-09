@@ -1,20 +1,20 @@
-- [ ] Possibilità di uplodare DXF (forse anche DWG) per il background del floor plan (convertendoli in dei file SVG o PNG).
+- [ ] Possibilita di uploadare DXF (forse anche DWG) per il background del floor plan, convertendoli in file SVG o PNG.
 
-- [x] ~~I marker per le stanze e le postazioni sono troppo grandi quando zoommi dentro, bisogna scalare la mappa senza far scalare i marker.~~
+- [x] ~~I marker per le stanze e le postazioni sono troppo grandi quando zoommi dentro: bisogna scalare la mappa senza far scalare i marker.~~
 
-- [x] ~~Possibilità di importare JSON per riutilizzare floor plan già creati in passato (ovviamente il JSON deve essere validato, incaso di JSON non valido/corrotto mandare pop-up di errore e non importare).~~
+- [x] ~~Possibilita di importare JSON per riutilizzare floor plan gia creati in passato. Il JSON deve essere validato e, in caso di JSON non valido o corrotto, va mostrato un pop-up di errore senza importare nulla.~~
 
 - [ ] Implementazione del tasto "Add meeting rooms" per aggiungere stanze riunioni (dovrebbe funzionare come il tasto "Add rooms" ma nelle meeting rooms non puoi aggiungere postazioni).
 
-- [ ] Rendere visibili le postazioni solo se la stanza è selezionata, implementare counter accanto al nome (label) della stanza che conti le postazioni associate alla stanza.
+- [ ] Rendere visibili le postazioni solo se la stanza e selezionata e implementare un counter accanto al nome della stanza che conti le postazioni associate.
 
-- [ ] Fare in modo che i marker possono solo essere aggiunti e mossi nei confini dell'immagine.
+- [x] ~~Fare in modo che i marker possano essere aggiunti e mossi solo nei confini dell'immagine.~~
 
-- [ ] creare un pop-up di conferma quando clicchi sul tasto Clear, il pop-up deve avere "conferma" e "annulla", se clicchi conferma allora si cancella ma se clicchi su annulla non viene cancellato nulla.
+- [x] ~~Creare un pop-up di conferma quando clicchi sul tasto Clear. Il pop-up deve avere "conferma" e "annulla": con conferma si cancella tutto, con annulla non viene cancellato nulla.~~
 
-- [x] ~~Fixare bug che se clicchi sul tasto clear quando provi ad uploadare una nuova immagine non viene renderizzata.~~
+- [x] ~~Fix del bug per cui, dopo aver cliccato Clear, una nuova immagine caricata non veniva renderizzata.~~
 
-- [ ] Implementazione di hotkeys per utilizzare l'editor in modo più veloce.
+- [ ] Implementazione di hotkeys per utilizzare l'editor in modo piu veloce.
 
 - [ ] Aggiornare la creazione del JSON (renderlo migliore).
 

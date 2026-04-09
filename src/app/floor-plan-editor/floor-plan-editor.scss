@@ -5,7 +5,7 @@
   font-family: var(--font-sans, sans-serif);
 }
 
-// ── Toolbar ────────────────────────────────────────────────────────────────
+// Toolbar
 .toolbar {
   display: flex;
   align-items: center;
@@ -46,22 +46,38 @@ button {
   white-space: nowrap;
   flex-shrink: 0;
 
-  svg { width: 13px; height: 13px; flex-shrink: 0; }
+  svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
 
-  &:hover:not(:disabled) { background: rgba(0, 0, 0, 0.05); }
-  &:active:not(:disabled) { transform: scale(0.98); }
-  &:disabled { opacity: 0.35; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
 
   &.active {
-    background: #E6F1FB;
-    color: #185FA5;
-    border-color: #B5D4F4;
+    background: #e6f1fb;
+    color: #185fa5;
+    border-color: #b5d4f4;
   }
 
   &.danger {
-    color: #A32D2D;
-    border-color: #F7C1C1;
-    &:hover:not(:disabled) { background: #FCEBEB; }
+    color: #a32d2d;
+    border-color: #f7c1c1;
+
+    &:hover:not(:disabled) {
+      background: #fcebeb;
+    }
   }
 }
 
@@ -73,7 +89,7 @@ button {
   flex-shrink: 0;
 }
 
-// ── Info bar ───────────────────────────────────────────────────────────────
+// Info bar
 .info-bar {
   display: flex;
   align-items: center;
@@ -91,7 +107,10 @@ button {
   gap: 5px;
   font-size: 11px;
   color: #555;
-  svg { flex-shrink: 0; }
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .legend-dot {
@@ -99,8 +118,14 @@ button {
   height: 10px;
   border-radius: 3px;
   flex-shrink: 0;
-  &.room    { background: #185FA5; }
-  &.station { background: #085041; }
+
+  &.room {
+    background: #185fa5;
+  }
+
+  &.station {
+    background: #085041;
+  }
 }
 
 .hint {
@@ -109,13 +134,13 @@ button {
   margin-left: 4px;
 }
 
-// ── Canvas ─────────────────────────────────────────────────────────────────
+// Canvas
 .canvas {
   flex: 1;
-  min-height: 0; // critical for flex children with overflow
+  min-height: 0;
 }
 
-// ── Status bar ─────────────────────────────────────────────────────────────
+// Status bar
 .status-bar {
   display: flex;
   gap: 16px;
@@ -127,7 +152,7 @@ button {
   flex-shrink: 0;
 }
 
-// ── Import error modal ──────────────────────────────────────────────────────
+// Modals
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -157,9 +182,20 @@ button {
   gap: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #A32D2D;
+  color: #a32d2d;
 
-  svg { flex-shrink: 0; stroke: #A32D2D; }
+  svg {
+    flex-shrink: 0;
+    stroke: #a32d2d;
+  }
+}
+
+.modal-header--warning {
+  color: #8a5b00;
+
+  svg {
+    stroke: #8a5b00;
+  }
 }
 
 .modal-body {
@@ -176,15 +212,41 @@ button {
   margin-top: 4px;
 }
 
+.modal-footer--split {
+  gap: 10px;
+}
+
 .modal-btn {
   font-size: 12px;
   padding: 6px 18px;
-  background: #185FA5;
+  background: #185fa5;
   color: #fff;
   border: none;
   border-radius: 6px;
   cursor: pointer;
 
-  &:hover { background: #145089; }
-  &:active { transform: scale(0.98); }
+  &:hover {
+    background: #145089;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.modal-btn--secondary {
+  background: #eef1f4;
+  color: #334155;
+
+  &:hover {
+    background: #e2e8f0;
+  }
+}
+
+.modal-btn--danger {
+  background: #a32d2d;
+
+  &:hover {
+    background: #8d2424;
+  }
 }

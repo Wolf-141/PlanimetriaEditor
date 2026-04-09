@@ -1,6 +1,10 @@
 import {
-  Component, Input, Output, EventEmitter,
-  HostBinding, HostListener,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  HostBinding,
+  HostListener,
 } from '@angular/core';
 import { Room } from '../models/floor-plan';
 
@@ -32,87 +36,107 @@ export interface MarkerDragStart {
       class="del-btn"
       title="Delete room"
       (mousedown)="$event.stopPropagation()"
-      (click)="$event.stopPropagation(); delete.emit(room.id)">✕</button>
+      (click)="$event.stopPropagation(); delete.emit(room.id)">x</button>
   `,
-  styles: [`
-    :host {
-      position: absolute;
-      transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
-      background: #185FA5;
-      color: #E6F1FB;
-      border: 2px solid #0C447C;
-      border-radius: 8px;
-      padding: 5px 10px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: move;
-      user-select: none;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      z-index: 10;
-    }
+  styles: [
+    `
+      :host {
+        position: absolute;
+        transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
+        background: #185fa5;
+        color: #e6f1fb;
+        border: 2px solid #0c447c;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: move;
+        user-select: none;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        z-index: 10;
+      }
 
-    .label {
-      outline: none;
-      background: transparent;
-      border: none;
-      color: inherit;
-      font: inherit;
-      min-width: 36px;
-      cursor: text;
-    }
+      .label {
+        outline: none;
+        background: transparent;
+        border: none;
+        color: inherit;
+        font: inherit;
+        min-width: 36px;
+        cursor: text;
+      }
 
-    .plus-btn {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      color: #E6F1FB;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      cursor: pointer;
-      padding: 0;
-      flex-shrink: 0;
-      line-height: 1;
-      font-weight: 300;
-    }
-    .plus-btn:hover { background: rgba(255, 255, 255, 0.4); }
+      .plus-btn {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #e6f1fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+        line-height: 1;
+        font-weight: 300;
+      }
 
-    .del-btn {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.2);
-      border: none;
-      color: #E6F1FB;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      cursor: pointer;
-      padding: 0;
-      flex-shrink: 0;
-    }
-    .del-btn:hover { background: #A32D2D; color: #FCEBEB; }
-  `],
+      .plus-btn:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      .del-btn {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.2);
+        border: none;
+        color: #e6f1fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+      }
+
+      .del-btn:hover {
+        background: #a32d2d;
+        color: #fcebeb;
+      }
+    `,
+  ],
 })
 export class RoomMarkerComponent {
   @Input({ required: true }) room!: Room;
   @Input() zoom = 1;
 
-  @Output() dragStart   = new EventEmitter<MarkerDragStart>();
-  @Output() addStation  = new EventEmitter<string>();  // roomId
-  @Output() delete      = new EventEmitter<string>();  // roomId
+  @Output() dragStart = new EventEmitter<MarkerDragStart>();
+  @Output() addStation = new EventEmitter<string>();
+  @Output() delete = new EventEmitter<string>();
   @Output() labelChange = new EventEmitter<{ id: string; label: string }>();
 
-  @HostBinding('style.left') get left() { return this.room.xPct + '%'; }
-  @HostBinding('style.top')  get top()  { return this.room.yPct + '%'; }
-  @HostBinding('style.--marker-scale') get markerScale() { return 1 / this.zoom; }
+  @HostBinding('style.left')
+  get left() {
+    return this.room.xPct + '%';
+  }
+
+  @HostBinding('style.top')
+  get top() {
+    return this.room.yPct + '%';
+  }
+
+  @HostBinding('style.--marker-scale')
+  get markerScale() {
+    return 1 / this.zoom;
+  }
 
   @HostListener('mousedown', ['$event'])
   onHostMouseDown(e: MouseEvent): void {
@@ -124,7 +148,10 @@ export class RoomMarkerComponent {
   }
 
   onKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLElement).blur(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      (e.target as HTMLElement).blur();
+    }
   }
 
   onLabelBlur(e: FocusEvent): void {
