@@ -63,3 +63,14 @@
   pointer-events: none;
   overflow: visible;
 }
+
+.markers-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  app-room-marker,
+  app-station-marker {
+    pointer-events: auto;
+  }
+}

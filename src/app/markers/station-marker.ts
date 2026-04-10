@@ -39,7 +39,7 @@ import { MarkerDragStart } from '../markers/room-marker';
     `
       :host {
         position: absolute;
-        transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
+        transform: translate(-50%, -50%);
         background: #085041;
         color: #9fe1cb;
         border: 1.5px solid #0f6e56;
@@ -116,12 +116,13 @@ import { MarkerDragStart } from '../markers/room-marker';
 export class StationMarkerComponent {
   @Input({ required: true }) station!: Station;
   @Input() roomLabel = '';
-  @Input() zoom = 1;
+  //@Input() zoom = 1;
 
   @Output() dragStart = new EventEmitter<MarkerDragStart>();
   @Output() delete = new EventEmitter<string>();
   @Output() labelChange = new EventEmitter<{ id: string; label: string }>();
 
+  /*
   @HostBinding('style.left')
   get left() {
     return this.station.xPct + '%';
@@ -136,6 +137,7 @@ export class StationMarkerComponent {
   get markerScale() {
     return 1 / this.zoom;
   }
+  */
 
   @HostListener('mousedown', ['$event'])
   onHostMouseDown(e: MouseEvent): void {

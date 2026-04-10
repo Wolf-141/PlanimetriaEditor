@@ -107,6 +107,20 @@ export class FloorCanvasComponent implements AfterViewInit {
     this.fps.applyZoom(0.8, width / 2, height / 2);
   }
 
+  toScreenX(xPct: number): number {
+    const { x: panX } = this.fps.pan();
+    const zoom = this.fps.zoom();
+    const { left, width } = this.imageFrame;
+    return panX + zoom * (left + (xPct / 100) * width);
+  }
+
+  toScreenY(yPct: number): number {
+    const { y: panY } = this.fps.pan();
+    const zoom = this.fps.zoom();
+    const { top, height } = this.imageFrame;
+    return panY + zoom * (top + (yPct / 100) * height);
+  }
+
   @HostListener('mousedown', ['$event'])
   onMouseDown(e: MouseEvent): void {
     if (e.button !== 0) return;

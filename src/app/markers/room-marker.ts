@@ -44,7 +44,7 @@ export interface MarkerDragStart {
     `
       :host {
         position: absolute;
-        transform: translate(-50%, -50%) scale(var(--marker-scale, 1));
+        transform: translate(-50%, -50%);
         color: #e6f1fb;
         border-radius: 8px;
         padding: 5px 10px;
@@ -128,7 +128,7 @@ export interface MarkerDragStart {
 export class RoomMarkerComponent {
   @Input() room?: Room;
   @Input() meeting?: Meeting;
-  @Input() zoom = 1;
+  //@Input() zoom = 1;
   @Input() showAddStation = true;
   @Input() variant: 'room' | 'meeting' = 'room';
 
@@ -145,6 +145,7 @@ export class RoomMarkerComponent {
     return this.variant === 'meeting' ? 'Delete meeting room' : 'Delete room';
   }
 
+  /*
   @HostBinding('style.left')
   get left() {
     return this.marker.xPct + '%';
@@ -154,12 +155,13 @@ export class RoomMarkerComponent {
   get top() {
     return this.marker.yPct + '%';
   }
-
+  
   @HostBinding('style.--marker-scale')
   get markerScale() {
     return 1 / this.zoom;
   }
-
+  */
+  
   @HostBinding('class.room')
   get roomClass() {
     return this.variant === 'room';

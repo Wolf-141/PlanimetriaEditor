@@ -19,3 +19,5 @@
 - [ ] Aggiornare la creazione del JSON (renderlo migliore).
 
 - [x] ~~Ottimizzare (quando muovi la mappa lagga).~~
+
+- [x] ~~Quando zoomi la risoluzione dei marker diminuisce e man mano che zoomi diventano molti più "pixellati".~~
