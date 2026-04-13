@@ -29,3 +29,5 @@
 - [ ] Quando clicchi sul tasto "+" per aggiungere una postazione (station) ad una stanza, bisogna fare in modo che puoi continuare ad aggiungere postazioni senza dover ri-cliccare sul "+" (ovviamente se clicchi sul tasto "+" di un'altra stanza o su "add room" etc allora cambia. Dovresti potere uscire dalla modalità di aggiungere stations anche quando premi esc sulla tastiera, come quando clicchi sul tasto "add rooms").
 
 - [ ] Ottimizzare (lag durante lo zoom).
+
+- [ ] aggiornare uid. (fare in modo che sia sempre unico).
