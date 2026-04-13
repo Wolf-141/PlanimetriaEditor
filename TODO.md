@@ -14,7 +14,7 @@
 
 - [x] ~~Fix del bug per cui, dopo aver cliccato Clear, una nuova immagine caricata non veniva renderizzata.~~
 
-- [ ] Implementazione di hotkeys per utilizzare l'editor in modo piu veloce.
+- [ ] Implementazione di hotkeys per utilizzare l'editor in modo piu veloce. (per ora ignorare)
 
 - [x] ~~Aggiornare la creazione del JSON (renderlo migliore).~~
 
@@ -22,6 +22,10 @@
 
 - [x] ~~Quando zoomi la risoluzione dei marker diminuisce e man mano che zoomi diventano molti più "pixellati".~~
 
-- [ ] Quando muovi la mappa i marker non si muovono finchè non rilasci. 
+- [x] ~~Quando muovi la mappa i marker non si muovono finchè non rilasci.~~ 
 
-- [ ] la mappa è molto pixellata quando zoomi, è un problema del file o del codice?
+- [x] ~~la mappa è molto pixellata quando zoomi, è un problema del file o del codice?~~
+
+- [ ] Quando clicchi sul tasto "+" per aggiungere una postazione (station) ad una stanza, bisogna fare in modo che puoi continuare ad aggiungere postazioni senza dover ri-cliccare sul "+" (ovviamente se clicchi sul tasto "+" di un'altra stanza o su "add room" etc allora cambia. Dovresti potere uscire dalla modalità di aggiungere stations anche quando premi esc sulla tastiera, come quando clicchi sul tasto "add rooms").
+
+- [ ] Ottimizzare (lag durante lo zoom).
