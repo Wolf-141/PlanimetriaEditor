@@ -16,8 +16,12 @@
 
 - [ ] Implementazione di hotkeys per utilizzare l'editor in modo piu veloce.
 
-- [ ] Aggiornare la creazione del JSON (renderlo migliore).
+- [x] ~~Aggiornare la creazione del JSON (renderlo migliore).~~
 
 - [x] ~~Ottimizzare (quando muovi la mappa lagga).~~
 
 - [x] ~~Quando zoomi la risoluzione dei marker diminuisce e man mano che zoomi diventano molti più "pixellati".~~
+
+- [ ] Quando muovi la mappa i marker non si muovono finchè non rilasci. 
+
+- [ ] la mappa è molto pixellata quando zoomi, è un problema del file o del codice?

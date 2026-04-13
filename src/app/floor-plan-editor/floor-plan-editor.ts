@@ -166,26 +166,17 @@ export class FloorPlanEditorComponent {
       if (!pos || typeof pos['xPct'] !== 'number' || typeof pos['yPct'] !== 'number') {
         return `rooms[${i}]: missing or invalid "position".`;
       }
-    }
-
-    if (!Array.isArray(d['stations'])) {
-      return 'Missing or invalid "stations" array.';
-    }
-    for (let i = 0; i < (d['stations'] as unknown[]).length; i++) {
-      const s = (d['stations'] as unknown[])[i] as Record<string, unknown>;
-      if (typeof s['id'] !== 'string') return `stations[${i}]: missing "id".`;
-      if (typeof s['label'] !== 'string') return `stations[${i}]: missing "label".`;
-      if (typeof s['roomId'] !== 'string') return `stations[${i}]: missing "roomId".`;
-      const pos = s['position'] as Record<string, unknown>;
-      if (!pos || typeof pos['xPct'] !== 'number' || typeof pos['yPct'] !== 'number') {
-        return `stations[${i}]: missing or invalid "position".`;
+      if (!Array.isArray(r['stations'])) {
+        return `rooms[${i}]: missing or invalid "stations" array.`;
       }
-    }
-
-    const roomIds = new Set((d['rooms'] as Array<Record<string, unknown>>).map((r) => r['id']));
-    for (const s of d['stations'] as Array<Record<string, unknown>>) {
-      if (!roomIds.has(s['roomId'])) {
-        return `Station "${s['id']}" references unknown roomId "${s['roomId']}".`;
+      for (let j = 0; j < (r['stations'] as unknown[]).length; j++) {
+        const s = (r['stations'] as unknown[])[j] as Record<string, unknown>;
+        if (typeof s['id'] !== 'string') return `rooms[${i}].stations[${j}]: missing "id".`;
+        if (typeof s['label'] !== 'string') return `rooms[${i}].stations[${j}]: missing "label".`;
+        const sPos = s['position'] as Record<string, unknown>;
+        if (!sPos || typeof sPos['xPct'] !== 'number' || typeof sPos['yPct'] !== 'number') {
+          return `rooms[${i}].stations[${j}]: missing or invalid "position".`;
+        }
       }
     }
 

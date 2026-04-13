@@ -42,14 +42,10 @@ export interface FloorPlanExport {
     id: string;
     label: string;
     position: { xPct: number; yPct: number };
-    stationIds: string[];
+    stations: Array<{
+      id: string;
+      label: string;
+      position: { xPct: number; yPct: number };
+    }>;
   }>;
-  stations: Array<{
-    id: string;
-    label: string;
-    position: { xPct: number; yPct: number };
-    roomId: string;
-    roomLabel: string;
-  }>;
-  connections: Array<{ stationId: string; roomId: string }>;
 }

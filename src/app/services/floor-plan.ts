@@ -157,13 +157,15 @@ export class FloorPlanService {
       yPct: r.position.yPct,
     }));
 
-    const stations: Station[] = data.stations.map((s) => ({
-      id: s.id,
-      label: s.label,
-      xPct: s.position.xPct,
-      yPct: s.position.yPct,
-      roomId: s.roomId,
-    }));
+    const stations: Station[] = data.rooms.flatMap((r) =>
+      r.stations.map((s) => ({
+        id: s.id,
+        label: s.label,
+        xPct: s.position.xPct,
+        yPct: s.position.yPct,
+        roomId: r.id,
+      })),
+    );
 
     this.meetings.set(meetings);
     this.rooms.set(rooms);
@@ -202,16 +204,14 @@ export class FloorPlanService {
         id: r.id,
         label: r.label,
         position: { xPct: round3(r.xPct), yPct: round3(r.yPct) },
-        stationIds: stations.filter((s) => s.roomId === r.id).map((s) => s.id),
+        stations: stations
+          .filter((s) => s.roomId === r.id)
+          .map((s) => ({
+            id: s.id,
+            label: s.label,
+            position: { xPct: round3(s.xPct), yPct: round3(s.yPct) },
+          })),
       })),
-      stations: stations.map((s) => ({
-        id: s.id,
-        label: s.label,
-        position: { xPct: round3(s.xPct), yPct: round3(s.yPct) },
-        roomId: s.roomId,
-        roomLabel: rooms.find((r) => r.id === s.roomId)?.label ?? '',
-      })),
-      connections: stations.map((s) => ({ stationId: s.id, roomId: s.roomId })),
     };
   }
 }
