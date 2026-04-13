@@ -42,6 +42,7 @@ export class FloorCanvasComponent implements AfterViewInit {
   private readonly ngZone = inject(NgZone);
 
   @ViewChild('sceneEl') sceneEl!: ElementRef<HTMLElement>;
+  @ViewChild('markersOverlayEl') private markersOverlayEl?: ElementRef<HTMLElement>;
 
   protected imageFrame: ImageFrame = { left: 0, top: 0, width: 0, height: 0 };
 
@@ -60,8 +61,8 @@ export class FloorCanvasComponent implements AfterViewInit {
   constructor() {
     effect(() => {
       const { x, y } = this.fps.pan();
-      const zoom = this.fps.zoom();
-      this.writeTransform(x, y, zoom);
+      this.fps.zoom(); // traccia dipendenza: re-run quando lo zoom cambia (le dimensioni fisiche sono nel template)
+      this.writeTransform(x, y);
     });
 
     effect(() => {
@@ -150,8 +151,11 @@ export class FloorCanvasComponent implements AfterViewInit {
       if (this.panMoved) {
         const x = this.panOriginX + dx;
         const y = this.panOriginY + dy;
-        this.writeTransform(x, y, this.fps.zoom());
+        this.writeTransform(x, y);
         this.pendingPan = { x, y };
+        // Fix 1: sposta l'overlay dei marker in sync con la scena, senza rientrare nella zone Angular
+        const overlayEl = this.markersOverlayEl?.nativeElement;
+        if (overlayEl) overlayEl.style.transform = `translate(${dx}px, ${dy}px)`;
       }
       return;
     }
@@ -185,6 +189,9 @@ export class FloorCanvasComponent implements AfterViewInit {
     if (wasPanning && this.pendingPan) {
       const { x, y } = this.pendingPan;
       this.pendingPan = null;
+      // Fix 1: azzera il translate temporaneo PRIMA che Angular ricalcoli le posizioni assolute
+      const overlayEl = this.markersOverlayEl?.nativeElement;
+      if (overlayEl) overlayEl.style.transform = '';
       this.ngZone.run(() => this.fps.setPan(x, y));
     }
 
@@ -277,9 +284,9 @@ export class FloorCanvasComponent implements AfterViewInit {
   }
 
   // Helpers
-  private writeTransform(x: number, y: number, zoom: number): void {
+  private writeTransform(x: number, y: number): void {
     const el = this.sceneEl?.nativeElement;
-    if (el) el.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+    if (el) el.style.transform = `translate(${x}px, ${y}px)`;
   }
 
   private hostRect() {
