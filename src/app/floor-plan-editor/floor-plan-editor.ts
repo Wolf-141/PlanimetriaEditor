@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject, computed, signal } from '@angular/core';
+import { Component, ViewChild, inject, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FloorPlanService } from '../services/floor-plan';
 import { FloorCanvasComponent } from '../floor-canvas/floor-canvas';
@@ -27,6 +27,15 @@ export class FloorPlanEditorComponent {
   /** Non-null when the import error modal should be shown. */
   readonly importError = signal<string | null>(null);
   readonly confirmClear = signal(false);
+
+  constructor() {
+    // Propagate DXF/file-load errors to the shared error modal.
+    // importError is already wired to the modal, so we reuse it here.
+    effect(() => {
+      const err = this.fps.loadError();
+      if (err) this.importError.set(err);
+    });
+  }
 
   readonly hint = computed(() => {
     switch (this.fps.mode()) {

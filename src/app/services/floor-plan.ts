@@ -1,8 +1,11 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Meeting, Room, Station, EditorMode, ImageMeta, FloorPlanExport } from '../models/floor-plan';
+import { DxfConverterService } from './dxf-converter';
 
 @Injectable({ providedIn: 'root' })
 export class FloorPlanService {
+  private readonly dxfConverter = inject(DxfConverterService);
+
   // State
   readonly rooms = signal<Room[]>([]);
   readonly meetings = signal<Meeting[]>([]);
@@ -12,6 +15,8 @@ export class FloorPlanService {
   readonly image = signal<ImageMeta | null>(null);
   readonly zoom = signal<number>(1);
   readonly pan = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+  /** Set when a file load fails (DXF parse error, unreadable file, etc.). */
+  readonly loadError = signal<string | null>(null);
 
   // Derived
   readonly roomMap = computed<Record<string, Room>>(() => {
@@ -31,6 +36,14 @@ export class FloorPlanService {
 
   // Image
   loadImage(file: File): void {
+    this.loadError.set(null);
+
+    if (file.name.toLowerCase().endsWith('.dxf')) {
+      this.loadDxf(file);
+      return;
+    }
+
+    // PNG / SVG and any other browser-native raster format
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
@@ -48,6 +61,26 @@ export class FloorPlanService {
       img.src = dataUrl;
     };
     reader.readAsDataURL(file);
+  }
+
+  private loadDxf(file: File): void {
+    const reader = new FileReader();
+    reader.onerror = () => {
+      this.loadError.set('Could not read the DXF file.');
+    };
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      try {
+        const { dataUrl, naturalWidth, naturalHeight } = this.dxfConverter.convert(text);
+        this.image.set({ filename: file.name, dataUrl, naturalWidth, naturalHeight });
+        this.setMode('view');
+        this.resetView();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.loadError.set(`DXF conversion failed: ${msg}`);
+      }
+    };
+    reader.readAsText(file);
   }
 
   // Rooms

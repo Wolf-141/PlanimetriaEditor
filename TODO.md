@@ -1,4 +1,4 @@
-- [ ] Possibilita di uploadare DXF (forse anche DWG) per il background del floor plan, convertendoli in file SVG o PNG.
+- [x] ~~Possibilita di uploadare DXF (forse anche DWG) per il background del floor plan, convertendoli in file SVG o PNG.~~
 
 - [x] ~~I marker per le stanze e le postazioni sono troppo grandi quando zoommi dentro: bisogna scalare la mappa senza far scalare i marker.~~
 
@@ -31,3 +31,5 @@
 - [ ] Ottimizzare (lag durante lo zoom).
 
 - [ ] aggiornare uid. (fare in modo che sia sempre unico).
+
+- [ ] Quando si fa la validazione del JSON durante l'importo bisogna controllare se il nome dell'immagine e le dimensioni sono le stesse, se si allora procedi come se nulla fosse ma se non sono le stesse allora crea un pop-up che avverte lo user che l'immagine non è la stessa e che quindi ci potrebbero essere problemi, con un bottone di conferma e uno di cancellazione (quello di cancellazione non fara importare il JSON mentre quello di conferma continuerà la validazione).
