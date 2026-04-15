@@ -26,7 +26,7 @@ export class FloorPlanEditorComponent {
   readonly importError = signal<string | null>(null);
   readonly confirmClear = signal(false);
   readonly imageWarning = signal<{ message: string; data: FloorPlanExport } | null>(null);
-  
+
   constructor() {
     // Propagate DXF/file-load errors to the shared error modal.
     // importError is already wired to the modal, so we reuse it here.
@@ -89,8 +89,9 @@ export class FloorPlanEditorComponent {
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    const imageName = data.image.filename.substring(0, data.image.filename.lastIndexOf("."));
     a.href = url;
-    a.download = 'floor-plan.json';
+    a.download = `${imageName}-floor-plan.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
