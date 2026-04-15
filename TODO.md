@@ -26,10 +26,10 @@
 
 - [x] ~~la mappa è molto pixellata quando zoomi, è un problema del file o del codice?~~
 
-- [ ] Quando clicchi sul tasto "+" per aggiungere una postazione (station) ad una stanza, bisogna fare in modo che puoi continuare ad aggiungere postazioni senza dover ri-cliccare sul "+" (ovviamente se clicchi sul tasto "+" di un'altra stanza o su "add room" etc allora cambia. Dovresti potere uscire dalla modalità di aggiungere stations anche quando premi esc sulla tastiera, come quando clicchi sul tasto "add rooms").
+- [x] ~~Quando clicchi sul tasto "+" per aggiungere una postazione (station) ad una stanza, bisogna fare in modo che puoi continuare ad aggiungere postazioni senza dover ri-cliccare sul "+" (ovviamente se clicchi sul tasto "+" di un'altra stanza o su "add room" etc allora cambia. Dovresti potere uscire dalla modalità di aggiungere stations anche quando premi esc sulla tastiera, come quando clicchi sul tasto "add rooms").~~
 
-- [ ] Ottimizzare (lag durante lo zoom). (semi-implementazione ma il lag mentre zoomi persiste, forse per ora non ottimizzabile)
+- [ ] Ottimizzare (lag durante lo zoom con la rotellina del mouse). (semi-implementazione ma il lag mentre zoomi persiste, forse per ora non ottimizzabile?)
 
 - [x] ~~aggiornare uid. (fare in modo che sia sempre unico).~~
 
-- [ ] Quando si fa la validazione del JSON durante l'importo bisogna controllare se il nome dell'immagine e le dimensioni sono le stesse, se si allora procedi come se nulla fosse ma se non sono le stesse allora crea un pop-up che avverte lo user che l'immagine non è la stessa e che quindi ci potrebbero essere problemi, con un bottone di conferma e uno di cancellazione (quello di cancellazione non fara importare il JSON mentre quello di conferma continuerà la validazione).
+- [x] ~~Quando si fa la validazione del JSON durante l'importo bisogna controllare se il nome dell'immagine e le dimensioni sono le stesse, se si, allora procedi come se nulla fosse, ma se no, allora crea un pop-up che avverte lo user che l'immagine non è la stessa e che quindi ci potrebbero essere problemi, con un bottone di conferma e uno di cancellazione (quello di cancellazione non fara importare il JSON mentre quello di conferma continuerà la validazione).~~

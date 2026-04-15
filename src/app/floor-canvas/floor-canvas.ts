@@ -222,7 +222,7 @@ export class FloorCanvasComponent implements AfterViewInit {
     }
 
     const mode = this.fps.mode();
-    this.elRef.nativeElement.style.cursor = mode !== 'view' ? 'crosshair' : 'grab';
+    this.elRef.nativeElement.style.cursor = mode === 'view' ? 'grab' : 'crosshair';
   }
 
   @HostListener('click', ['$event'])
@@ -243,7 +243,9 @@ export class FloorCanvasComponent implements AfterViewInit {
       const roomId = this.fps.pendingRoomId();
       if (roomId) {
         this.fps.addStation(point.x, point.y, roomId);
-        this.fps.setMode('view');
+        // Resta in placing-station per lo stesso roomId: l'utente può continuare
+        // ad aggiungere postazioni senza dover ri-cliccare su "+".
+        // Si esce con Esc (onEscape) o cliccando un altro tool.
       }
     }
   }

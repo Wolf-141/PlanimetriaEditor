@@ -23,10 +23,9 @@ export class FloorPlanEditorComponent {
   readonly stationCount = computed(() => this.fps.stations().length);
   readonly isPlacingRoom = computed(() => this.fps.mode() === 'placing-room');
   readonly isPlacingMeeting = computed(() => this.fps.mode() === 'placing-meeting');
-
-  /** Non-null when the import error modal should be shown. */
   readonly importError = signal<string | null>(null);
   readonly confirmClear = signal(false);
+  readonly imageWarning = signal<{ message: string; data: FloorPlanExport } | null>(null);
 
   constructor() {
     // Propagate DXF/file-load errors to the shared error modal.
@@ -119,6 +118,32 @@ export class FloorPlanEditorComponent {
       }
 
       const data = parsed as FloorPlanExport;
+
+      // Check if the loaded image matches the one in the JSON
+      const currentImg = this.fps.image();
+      if (currentImg) {
+        const jsonImg = data.image;
+        const nameMismatch = jsonImg.filename !== currentImg.filename;
+        const sizeMismatch =
+          jsonImg.naturalWidth !== currentImg.naturalWidth ||
+          jsonImg.naturalHeight !== currentImg.naturalHeight;
+
+        if (nameMismatch || sizeMismatch) {
+          const details: string[] = [];
+          if (nameMismatch)
+            details.push(`filename: "${currentImg.filename}" vs "${jsonImg.filename}"`);
+          if (sizeMismatch)
+            details.push(
+              `dimensions: ${currentImg.naturalWidth}×${currentImg.naturalHeight} vs ${jsonImg.naturalWidth}×${jsonImg.naturalHeight}`,
+            );
+          this.imageWarning.set({
+            message: `The JSON was created with a different image (${details.join(', ')}). Marker positions may not align correctly.`,
+            data,
+          });
+          return;
+        }
+      }
+
       this.fps.importFromExport(data);
     };
 
@@ -127,6 +152,18 @@ export class FloorPlanEditorComponent {
 
   private showImportError(msg: string): void {
     this.importError.set(msg);
+  }
+
+  confirmImageWarning(): void {
+    const pending = this.imageWarning();
+    if (pending) {
+      this.imageWarning.set(null);
+      this.fps.importFromExport(pending.data);
+    }
+  }
+
+  cancelImageWarning(): void {
+    this.imageWarning.set(null);
   }
 
   /**
