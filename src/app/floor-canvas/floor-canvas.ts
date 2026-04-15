@@ -58,6 +58,12 @@ export class FloorCanvasComponent implements AfterViewInit {
   /** Pending pan values to commit to the signal on mouseup. */
   private pendingPan: { x: number; y: number } | null = null;
 
+  // Zoom state — RAF-throttled to coalesce rapid wheel events into one signal update
+  private pendingZoomFactor = 1;
+  private pendingZoomFocalX = 0;
+  private pendingZoomFocalY = 0;
+  private zoomRafId: number | null = null;
+
   constructor() {
     effect(() => {
       const { x, y } = this.fps.pan();
@@ -93,7 +99,27 @@ export class FloorCanvasComponent implements AfterViewInit {
   private onWheel(e: WheelEvent): void {
     e.preventDefault();
     const rect = this.hostRect();
-    this.fps.applyZoom(e.deltaY < 0 ? 1.1 : 0.9, e.clientX - rect.left, e.clientY - rect.top);
+    const factor = e.deltaY < 0 ? 1.1 : 0.9;
+    const focalX = e.clientX - rect.left;
+    const focalY = e.clientY - rect.top;
+
+    // Accumulate factors so that bursts of wheel events are collapsed into a
+    // single applyZoom() call per animation frame — no change-detection churn
+    // during fast scrolling.
+    this.pendingZoomFactor *= factor;
+    this.pendingZoomFocalX = focalX;
+    this.pendingZoomFocalY = focalY;
+
+    if (this.zoomRafId === null) {
+      this.zoomRafId = requestAnimationFrame(() => {
+        this.zoomRafId = null;
+        const f = this.pendingZoomFactor;
+        const fx = this.pendingZoomFocalX;
+        const fy = this.pendingZoomFocalY;
+        this.pendingZoomFactor = 1; // reset accumulator
+        this.ngZone.run(() => this.fps.applyZoom(f, fx, fy));
+      });
+    }
   }
 
   /** Called by toolbar zoom-in button */

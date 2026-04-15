@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, Signal } from '@angular/core';
 import { Meeting, Room, Station, EditorMode, ImageMeta, FloorPlanExport } from '../models/floor-plan';
 import { DxfConverterService } from './dxf-converter';
 
@@ -31,8 +31,20 @@ export class FloorPlanService {
     return map;
   });
 
-  readonly stationsForRoom = (roomId: string) =>
-    computed(() => this.stations().filter((s) => s.roomId === roomId));
+  /**
+   * Returns a stable cached computed signal for the given roomId.
+   * Calling this repeatedly with the same ID never creates duplicate computed instances.
+   */
+  private readonly _stationsForRoomCache = new Map<string, Signal<Station[]>>();
+
+  stationsForRoom(roomId: string): Signal<Station[]> {
+    let sig = this._stationsForRoomCache.get(roomId);
+    if (!sig) {
+      sig = computed(() => this.stations().filter((s) => s.roomId === roomId));
+      this._stationsForRoomCache.set(roomId, sig);
+    }
+    return sig;
+  }
 
   // Image
   loadImage(file: File): void {
@@ -86,7 +98,7 @@ export class FloorPlanService {
   // Rooms
   addRoom(xPct: number, yPct: number): Room {
     const room: Room = {
-      id: uid('room'),
+      id: crypto.randomUUID(),
       label: `Room ${this.rooms().length + 1}`,
       xPct,
       yPct,
@@ -107,7 +119,7 @@ export class FloorPlanService {
   // Meetings
   addMeeting(xPct: number, yPct: number): Meeting {
     const meeting: Meeting = {
-      id: uid('meeting'),
+      id: crypto.randomUUID(),
       label: `Meeting Room ${this.meetings().length + 1}`,
       xPct,
       yPct,
@@ -129,7 +141,7 @@ export class FloorPlanService {
     const room = this.rooms().find((r) => r.id === roomId);
     const idx = this.stations().filter((s) => s.roomId === roomId).length + 1;
     const station: Station = {
-      id: uid('stn'),
+      id: crypto.randomUUID(),
       label: `Station ${idx}`,
       xPct,
       yPct,
@@ -250,10 +262,6 @@ export class FloorPlanService {
 }
 
 // Helpers
-function uid(prefix: string): string {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-}
-
 function round3(n: number): number {
   return Math.round(n * 1000) / 1000;
 }
