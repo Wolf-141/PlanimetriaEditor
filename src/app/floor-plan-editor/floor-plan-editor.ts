@@ -26,7 +26,7 @@ export class FloorPlanEditorComponent {
   readonly importError = signal<string | null>(null);
   readonly confirmClear = signal(false);
   readonly imageWarning = signal<{ message: string; data: FloorPlanExport } | null>(null);
-
+  
   constructor() {
     // Propagate DXF/file-load errors to the shared error modal.
     // importError is already wired to the modal, so we reuse it here.
