@@ -65,3 +65,8 @@ For running the application inside a docker container, run:
 ```bash
 docker compose up --build
 ```
+
+To stop the container, run:
+```bash
+docker compose down
+```
