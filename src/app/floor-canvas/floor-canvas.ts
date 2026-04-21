@@ -215,7 +215,6 @@ export class FloorCanvasComponent implements AfterViewInit {
     if (wasPanning && this.pendingPan) {
       const { x, y } = this.pendingPan;
       this.pendingPan = null;
-      // Fix 1: azzera il translate temporaneo PRIMA che Angular ricalcoli le posizioni assolute
       const overlayEl = this.markersOverlayEl?.nativeElement;
       if (overlayEl) overlayEl.style.transform = '';
       this.ngZone.run(() => this.fps.setPan(x, y));
@@ -243,9 +242,6 @@ export class FloorCanvasComponent implements AfterViewInit {
       const roomId = this.fps.pendingRoomId();
       if (roomId) {
         this.fps.addStation(point.x, point.y, roomId);
-        // Resta in placing-station per lo stesso roomId: l'utente può continuare
-        // ad aggiungere postazioni senza dover ri-cliccare su "+".
-        // Si esce con Esc (onEscape) o cliccando un altro tool.
       }
     }
   }
