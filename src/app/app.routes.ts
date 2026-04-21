@@ -10,5 +10,10 @@ export const routes: Routes = [
     {
         path:'editor',
         component: FloorPlanEditorComponent
+    },
+    {
+        path:'**',
+        redirectTo:'editor',
+        pathMatch:'full'
     }
 ];
