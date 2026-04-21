@@ -12,9 +12,9 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## Docker
+## Building using Docker
 
-For running the application inside a docker container, run:
+To build the application inside a docker container, run:
 
 ```bash
 docker compose up --build
