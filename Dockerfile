@@ -13,12 +13,14 @@ RUN npm run build
 FROM nginx:alpine
 
 # rimuove config default nginx
-RUN rm -rf /usr/share/nginx/html/*
+#RUN rm -rf /usr/share/nginx/html/*
 
 # copia l'output browser del build Angular
 COPY --from=build /app/dist/PlanimetriaEditor/browser /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+RUN nginx -t
 
 EXPOSE 80
 
